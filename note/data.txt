@@ -1,0 +1,8 @@
+برای تبدیل اینتیتی به میگرشن
+
+❯ npx tsx ./node_modules/typeorm/cli.js migration:generate src/migrations/CreateUsers -d backend/src/databases/data-source.ts
+
+
+برای ساخت جدول از میگرشن 
+
+❯ npx tsx ./node_modules/typeorm/cli.js migration:run -d backend/src/databases/data-source.ts
