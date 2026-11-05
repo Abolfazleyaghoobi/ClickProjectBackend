@@ -1,4 +1,5 @@
 import { AppError } from "../../shared/errors/app.error";
+import { hashPassword } from "../../shared/utils/hashPassword";
 import {  CreateUser_interface } from "./users.dto";
 
 import { usersRepository } from "./users.repository";
@@ -13,15 +14,16 @@ export const createUser_service= async (data:CreateUser_interface)=>{
         if(existUser){
             throw new AppError("Username already exists",409);
         }
+        const hashPass= await hashPassword(data.password);
         const user=  usersRepository.create({
             username:data.username,
             phone:data.phone,
-            password_hash:data.password
+            password_hash:hashPass
 
         });
         return usersRepository.save(user);
-    } catch (error) {
-        throw new AppError("Error creating user",500);
+    } catch (error:any) {
+        throw new AppError(error,500);
     }
 
 

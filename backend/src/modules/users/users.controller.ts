@@ -3,6 +3,7 @@ import { CreateUserSchema } from "./users.validataion";
 import { AppError } from "../../shared/errors/app.error";
 import { ZodError } from "zod";
 import { createUser_service } from "./users.service";
+import { mapDatabaseError } from "../../shared/middlewares/mapDatabaseError";
 
 export const createUser_controller: RequestHandler =async  (req, res, next) => {
   try {
@@ -17,10 +18,11 @@ export const createUser_controller: RequestHandler =async  (req, res, next) => {
         field: issue.path.join("."),
         message: issue.message,
       }));
-
+      
       throw new AppError("Validation failed", 400, { errors: zodERR });
     }
+  
 
-    return next(err);
+    return next(mapDatabaseError(err));
   }
 };
