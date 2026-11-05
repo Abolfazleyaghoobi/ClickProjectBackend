@@ -20,9 +20,7 @@ export enum UserStatus {
 }
 
 @Entity("users")
-@Index("UQ_users_username_normalized", ["username_normalized"], {
-  unique: true,
-})
+
 @Index("UQ_users_phone", ["phone"], {
   unique: true,
 })
@@ -39,11 +37,6 @@ export class User {
   })
   username!: string;
 
-  @Column({
-    type: "varchar",
-    length: 24,
-  })
-  username_normalized!: string;
 
   @Column({
     type: "varchar",
