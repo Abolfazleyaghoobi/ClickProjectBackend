@@ -18,7 +18,7 @@ function getNumberEnv(key: string, fallback: number): number {
 
   return value;
 }
-
+const jwtSecret = getEnv("JWT_SECRET");
 
 
 export const env = {
@@ -30,6 +30,6 @@ export const env = {
   DB_USERNAME: getEnv("DB_USERNAME"),
   DB_PASSWORD: process.env.DB_PASSWORD ?? "",
   DB_DATABASE: getEnv("DB_DATABASE"),
-
+JWT_SECRET:jwtSecret
 
 };
