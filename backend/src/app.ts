@@ -6,6 +6,7 @@ import { env } from "./configs/env";
 import { appConfig } from "./configs/app.config";
 import { apiRoute } from "./routes/routes";
 import { errorMiddleware } from "./shared/middlewares/error.middleware";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(
 );
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 app.use(appConfig.apiPrefix,apiRoute)
 
 

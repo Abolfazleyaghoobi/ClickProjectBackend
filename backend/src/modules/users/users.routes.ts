@@ -1,5 +1,6 @@
 import { Router } from "express";
-import {  login_controller, register_controller } from "./users.controller";
+import {  getInfoUser_controller, login_controller, register_controller } from "./users.controller";
+import { authenticate } from "../../shared/middlewares/auth.middleware";
 
 
 export const usersRouter = Router();
@@ -11,5 +12,7 @@ usersRouter.post("/register",register_controller)
 // login user
 usersRouter.post("/login",login_controller)
 
+
+usersRouter.get("/profile",authenticate,getInfoUser_controller)
 
 

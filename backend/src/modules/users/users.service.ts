@@ -9,8 +9,7 @@ import { usersRepository } from "./users.repository";
 
 // register User
 export const createUser_service = async (data: Register_interface) => {
-  return await AppDataSource.transaction(async (manager:any) => {
-
+  return await AppDataSource.transaction(async (manager: any) => {
     const userRepository = manager.getRepository(User);
     const profileRepository = manager.getRepository(UserProfile);
 
@@ -33,7 +32,7 @@ export const createUser_service = async (data: Register_interface) => {
     });
 
     await profileRepository.save(profile);
-    
+
     // Return User Data
     return {
       id: savedUser.id,
@@ -57,27 +56,51 @@ export const createUser_service = async (data: Register_interface) => {
 
 // login user
 export const login_service = async (data: Login_interface) => {
+  const existUser = await usersRepository
+    .createQueryBuilder("user")
+    .addSelect("user.password_hash")
+    .where("user.username = :username", {
+      username: data.username,
+    })
+    .getOne();
 
-    const existUser = await usersRepository
-        .createQueryBuilder("user")
-        .addSelect("user.password_hash")
-        .where("user.username = :username", {
-            username: data.username
-        })
-        .getOne();
+  if (!existUser) {
+    throw new AppError("Username not found", 404);
+  }
 
-    if (!existUser) {
-        throw new AppError("Username not found", 404);
-    }
+  const isMatch = await verifyPassword(data.password, existUser.password_hash);
 
-    const isMatch = await verifyPassword(
-        data.password,
-        existUser.password_hash
-    );
+  if (!isMatch) {
+    throw new AppError("Password not match", 401);
+  }
 
-    if (!isMatch) {
-        throw new AppError("Password not match", 401);
-    }
+  return existUser;
+};
 
-    return existUser;
+// get info user
+export const getInfo_servece = async (id: string) => {
+  const user = await usersRepository.findOne({
+    where: { id },
+    relations: {
+      profile: true,
+    },
+    select: {
+      id: true,
+      username: true,
+      phone: true,
+      status: true,
+      level: true,
+      xp: true,
+      xp_to_next_level: true,
+      step_balance: true,
+      profile: {
+        display_name: true,
+        bio: true,
+        avatar_url: true,
+        banner_url: true,
+      },
+    },
+  });
+
+  return user;
 };
