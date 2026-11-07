@@ -1,10 +1,12 @@
 import type { RequestHandler } from "express";
-import { CreateUserSchema } from "./users.validataion";
+import { CreateUserSchema, LoginUserSchema } from "./users.validataion";
 import { AppError } from "../../shared/errors/app.error";
 import { ZodError } from "zod";
-import { createUser_service } from "./users.service";
+import { createUser_service, login_service } from "./users.service";
 import { mapDatabaseError } from "../../shared/middlewares/mapDatabaseError";
 import { generateToken } from "../../shared/utils/generateJWT";
+
+// register User
 
 export const register_controller: RequestHandler = async (req, res, next) => {
   try {
@@ -46,3 +48,53 @@ export const register_controller: RequestHandler = async (req, res, next) => {
     return next(mapDatabaseError(err));
   }
 };
+
+
+// Login User
+
+export const login_controller: RequestHandler = async (req, res, next) => {
+  const data = LoginUserSchema.parse(req.body);
+  try {
+    const result = await login_service(data);
+
+
+
+
+
+    // Generate token
+    const token = generateToken({
+      id: result!.id,
+    });
+
+   
+    // Send cookie
+    res.cookie("access_token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+       // Response
+    res.status(200).json({
+      success: true,
+      message: "User login successfully", 
+    });
+
+  } catch (err: any) {
+   if (err instanceof ZodError) {
+        const zodERR = err.issues.map((issue: any) => ({
+            field: issue.path.join("."),
+            message: issue.message,
+        }));
+
+        return next(
+            new AppError("Validation failed", 400, { errors: zodERR })
+        );
+    }
+
+ 
+
+    return next(mapDatabaseError(err));
+  }
+}
