@@ -1,28 +1,58 @@
+import { AppDataSource } from "../../databases/data-source";
 import { AppError } from "../../shared/errors/app.error";
 import { hashPassword, verifyPassword } from "../../shared/utils/hashPassword";
+import { UserProfile } from "./entities/userProfile.entity";
+import { User } from "./entities/users.entity";
 import { Login_interface, Register_interface } from "./users.dto";
 
 import { usersRepository } from "./users.repository";
 
 // register User
 export const createUser_service = async (data: Register_interface) => {
-  try {
-    const existUser = await usersRepository.findOneBy({
-      username: data.username,
-    });
-    if (existUser) {
-      throw new AppError("Username already exists", 409);
-    }
-    const hashPass = await hashPassword(data.password);
-    const user = usersRepository.create({
+  return await AppDataSource.transaction(async (manager:any) => {
+
+    const userRepository = manager.getRepository(User);
+    const profileRepository = manager.getRepository(UserProfile);
+
+    // Hash Password
+    const passwordHash = await hashPassword(data.password);
+
+    // Create User
+    const user = userRepository.create({
       username: data.username,
       phone: data.phone,
-      password_hash: hashPass,
+      password_hash: passwordHash,
     });
-    return usersRepository.save(user);
-  } catch (error: any) {
-    throw new AppError(error, 500);
-  }
+
+    const savedUser = await userRepository.save(user);
+
+    // Create User Profile
+    const profile = profileRepository.create({
+      user: savedUser,
+      display_name: savedUser.username,
+    });
+
+    await profileRepository.save(profile);
+    
+    // Return User Data
+    return {
+      id: savedUser.id,
+      username: savedUser.username,
+      phone: savedUser.phone,
+      role: savedUser.role,
+      status: savedUser.status,
+      level: savedUser.level,
+      xp: savedUser.xp,
+      xp_to_next_level: savedUser.xp_to_next_level,
+      step_balance: savedUser.step_balance,
+      profile: {
+        display_name: profile.display_name,
+        bio: profile.bio,
+        avatar_url: profile.avatar_url,
+        banner_url: profile.banner_url,
+      },
+    };
+  });
 };
 
 // login user
