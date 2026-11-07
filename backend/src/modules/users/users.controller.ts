@@ -27,9 +27,10 @@ export const register_controller: RequestHandler = async (req, res, next) => {
     // Send cookie
     res.cookie("access_token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: false, // فقط محیط توسعه
       sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: "/",
+      maxAge: 15 * 60 * 1000, // 15 دقیقه
     });
 
     // Response
@@ -67,15 +68,17 @@ export const login_controller: RequestHandler = async (req, res, next) => {
     // Send cookie
     res.cookie("access_token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: false, // فقط محیط توسعه
       sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: "/",
+      maxAge: 15 * 60 * 1000, // 15 دقیقه
     });
 
     // Response
     res.status(200).json({
       success: true,
       message: "User login successfully",
+      result,
     });
   } catch (err: any) {
     if (err instanceof ZodError) {
@@ -100,7 +103,7 @@ export const getInfoUser_controller: RequestHandler = async (
 ) => {
   try {
     const cookeId = req.cookies.access_token;
-     if (!cookeId) {
+    if (!cookeId) {
       return next(new AppError("token is not found", 401));
     }
     const decoded = jwt.decode(cookeId);

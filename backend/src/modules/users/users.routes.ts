@@ -3,16 +3,18 @@ import {  getInfoUser_controller, login_controller, register_controller } from "
 import { authenticate } from "../../shared/middlewares/auth.middleware";
 
 
-export const usersRouter = Router();
+export const usersAuthRouter = Router();
+export const usersProfileRouter = Router();
 
 
 // register user
-usersRouter.post("/register",register_controller)
+usersAuthRouter.post("/register",register_controller)
 
 // login user
-usersRouter.post("/login",login_controller)
+usersAuthRouter.post("/login",login_controller)
 
 
-usersRouter.get("/profile",authenticate,getInfoUser_controller)
+usersProfileRouter.get("/",authenticate,getInfoUser_controller)
 
 
+    

@@ -59,6 +59,7 @@ export const login_service = async (data: Login_interface) => {
   const existUser = await usersRepository
     .createQueryBuilder("user")
     .addSelect("user.password_hash")
+    .leftJoinAndSelect("user.profile", "profile")
     .where("user.username = :username", {
       username: data.username,
     })
@@ -73,8 +74,15 @@ export const login_service = async (data: Login_interface) => {
   if (!isMatch) {
     throw new AppError("Password not match", 401);
   }
-
-  return existUser;
+  const userResponse = {
+    id: existUser.id,
+    username: existUser.username,
+    phone: existUser.phone,
+    profile: {
+      avatar_url: existUser.profile?.avatar_url,
+    },
+  };
+  return userResponse;
 };
 
 // get info user
