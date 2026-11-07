@@ -7,6 +7,8 @@ import {
   DeleteDateColumn,
   Index,
 } from "typeorm";
+import { OneToOne } from "typeorm";
+import { UserProfile } from "./userProfile.entity";
 
 export enum UserRole {
   USER = "user",
@@ -20,10 +22,12 @@ export enum UserStatus {
 }
 
 @Entity("users")
-
 @Index("UQ_users_phone", ["phone"], {
   unique: true,
 })
+
+
+
 export class User {
   @PrimaryGeneratedColumn({
     type: "bigint",
@@ -36,7 +40,6 @@ export class User {
     length: 24,
   })
   username!: string;
-
 
   @Column({
     type: "varchar",
@@ -65,12 +68,30 @@ export class User {
   })
   status!: UserStatus;
 
+  @Column({ type: "int", unsigned: true, default: 1 })
+  level!: number;
+
+  @Column({ type: "int", unsigned: true, default: 0 })
+  xp!: number;
+
+  @Column({ type: "int", unsigned: true, default: 1000 })
+  xp_to_next_level!: number;
+
+  @Column({ type: "int", unsigned: true, default: 0 })
+  step_balance!: number;
+
+
+  @OneToOne(() => UserProfile, (profile:UserProfile) => profile.user)
+  profile!: UserProfile;
+
   @Column({
     type: "datetime",
     nullable: true,
   })
   phone_verified_at!: Date | null;
 
+
+  
   @Column({
     type: "datetime",
     nullable: true,
