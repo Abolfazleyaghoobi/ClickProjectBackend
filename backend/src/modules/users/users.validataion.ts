@@ -31,3 +31,13 @@ export const UpdateProfileSchema = z.object({
         message: "At least one field must be provided",
     }
 );
+
+export const UpdateAccountSchema = z.object({
+     username: z.string().min(3).max(12).optional(),
+    phone: z.string().regex(/^09\d{9}$/, "phone is invalid").optional(),
+}).refine(
+    (data) => Object.keys(data).length >= 1,
+    {
+        message: "At least one field must be provided",
+    }
+);

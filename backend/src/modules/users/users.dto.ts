@@ -23,5 +23,5 @@ export interface UpdateProfileDTO {
 export interface UpdateUserDTO {
     username?: string;
     phone?: string;
-    password?: string;
+  
 }

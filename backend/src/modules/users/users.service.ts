@@ -3,7 +3,7 @@ import { AppError } from "../../shared/errors/app.error";
 import { hashPassword, verifyPassword } from "../../shared/utils/hashPassword";
 import { UserProfile } from "./entities/userProfile.entity";
 import { User } from "./entities/users.entity";
-import { Login_interface, Register_interface, UpdateProfileDTO } from "./users.dto";
+import { Login_interface, Register_interface, UpdateProfileDTO, UpdateUserDTO } from "./users.dto";
 
 import { profileRepository, usersRepository } from "./users.repository";
 
@@ -113,11 +113,7 @@ export const getInfo_servece = async (id: string) => {
   return user;
 };
 
-
-
-
-
-
+// update profile
 export const updateProfile = async (
     userId: string,
     data: UpdateProfileDTO
@@ -134,4 +130,23 @@ export const updateProfile = async (
     Object.assign(profile, data); 
 
     return await profileRepository.save(profile);
+};
+
+// updata account
+export const updateAccount = async (
+    userId: string,
+    data: UpdateUserDTO
+) => {
+
+    const profile = await usersRepository.findOneBy({
+        id: userId
+    });
+
+    if (!profile) {
+        throw new AppError("Profile not found",404);
+    }
+
+    Object.assign(profile, data); 
+
+    return await usersRepository.save(profile);
 };

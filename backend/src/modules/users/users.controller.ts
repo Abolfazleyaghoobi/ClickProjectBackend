@@ -2,6 +2,7 @@ import type { RequestHandler } from "express";
 import {
   CreateUserSchema,
   LoginUserSchema,
+  UpdateAccountSchema,
   UpdateProfileSchema,
 } from "./users.validataion";
 import { AppError } from "../../shared/errors/app.error";
@@ -10,6 +11,7 @@ import {
   createUser_service,
   getInfo_servece,
   login_service,
+  updateAccount,
   updateProfile,
 } from "./users.service";
 import { mapDatabaseError } from "../../shared/middlewares/mapDatabaseError";
@@ -148,6 +150,44 @@ export const updateProfile_controller: RequestHandler = async (
     const data = UpdateProfileSchema.parse(req.body);
 
     const result = await updateProfile(decoded.id, data);
+
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      data: result,
+    });
+  } catch (err: any) {
+    if (err instanceof ZodError) {
+      const zodERR = err.issues.map((issue: any) => ({
+        field: issue.path.join("."),
+        message: issue.message,
+      }));
+
+      throw new AppError("Validation failed", 400, { errors: zodERR });
+    }
+
+    return next(mapDatabaseError(err));
+  }
+};
+
+// update user account
+export const updateAccount_controller: RequestHandler = async (
+  req,
+  res,
+  next,
+) => {
+  try {
+    const token = req.cookies.access_token;
+    const decoded = jwt.decode(token);
+
+    if (!decoded || typeof decoded === "string") {
+      throw new AppError("Invalid token", 401);
+    }
+
+    const data = UpdateAccountSchema.parse(req.body);
+
+    const result = await updateAccount(decoded.id, data);
 
 
     return res.status(200).json({
