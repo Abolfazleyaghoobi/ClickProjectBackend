@@ -1,11 +1,16 @@
 import type { RequestHandler } from "express";
-import { CreateUserSchema, LoginUserSchema } from "./users.validataion";
+import {
+  CreateUserSchema,
+  LoginUserSchema,
+  UpdateProfileSchema,
+} from "./users.validataion";
 import { AppError } from "../../shared/errors/app.error";
 import { string, ZodError } from "zod";
 import {
   createUser_service,
   getInfo_servece,
   login_service,
+  updateProfile,
 } from "./users.service";
 import { mapDatabaseError } from "../../shared/middlewares/mapDatabaseError";
 import { generateToken } from "../../shared/utils/generateJWT";
@@ -30,7 +35,7 @@ export const register_controller: RequestHandler = async (req, res, next) => {
       secure: false, // فقط محیط توسعه
       sameSite: "lax",
       path: "/",
-      maxAge: 15 * 60 * 1000, // 15 دقیقه
+      maxAge: 70 * 60 * 1000, // 15 دقیقه
     });
 
     // Response
@@ -56,8 +61,8 @@ export const register_controller: RequestHandler = async (req, res, next) => {
 // Login User
 
 export const login_controller: RequestHandler = async (req, res, next) => {
-  const data = LoginUserSchema.parse(req.body);
   try {
+    const data = LoginUserSchema.parse(req.body);
     const result = await login_service(data);
 
     // Generate token
@@ -71,7 +76,7 @@ export const login_controller: RequestHandler = async (req, res, next) => {
       secure: false, // فقط محیط توسعه
       sameSite: "lax",
       path: "/",
-      maxAge: 15 * 60 * 1000, // 15 دقیقه
+      maxAge: 70 * 60 * 1000, // 15 دقیقه
     });
 
     // Response
@@ -121,6 +126,45 @@ export const getInfoUser_controller: RequestHandler = async (
       data: result,
     });
   } catch (err: any) {
+    return next(mapDatabaseError(err));
+  }
+};
+
+// update profile
+
+export const updateProfile_controller: RequestHandler = async (
+  req,
+  res,
+  next,
+) => {
+  try {
+    const token = req.cookies.access_token;
+    const decoded = jwt.decode(token);
+
+    if (!decoded || typeof decoded === "string") {
+      throw new AppError("Invalid token", 401);
+    }
+
+    const data = UpdateProfileSchema.parse(req.body);
+
+    const result = await updateProfile(decoded.id, data);
+
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      data: result,
+    });
+  } catch (err: any) {
+    if (err instanceof ZodError) {
+      const zodERR = err.issues.map((issue: any) => ({
+        field: issue.path.join("."),
+        message: issue.message,
+      }));
+
+      throw new AppError("Validation failed", 400, { errors: zodERR });
+    }
+
     return next(mapDatabaseError(err));
   }
 };

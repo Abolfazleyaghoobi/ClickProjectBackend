@@ -10,7 +10,7 @@ const passwordRegex =
 export const CreateUserSchema = z.object({
   username: z.string().min(3).max(12),
   phone: z.string().regex(/^09\d{9}$/, "phone is invalid"),
-  dispaly_name: z.string().min(3).max(12),
+  display_name: z.string().min(3).max(12),
   password: z.string().min(6).max(15).regex(passwordRegex, "Weak password"),
 });
 
@@ -19,3 +19,15 @@ export const LoginUserSchema = z.object({
 
   password: z.string().min(6).max(15).regex(passwordRegex, "Weak password"),
 });
+
+export const UpdateProfileSchema = z.object({
+    display_name: z.string().min(3).max(60).optional(),
+    bio: z.string().optional(),
+    avatar_url: z.string().url().optional(),
+    banner_url: z.string().url().optional(),
+}).refine(
+    (data) => Object.keys(data).length >= 1,
+    {
+        message: "At least one field must be provided",
+    }
+);

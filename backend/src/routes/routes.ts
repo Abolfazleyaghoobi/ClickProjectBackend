@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { usersAuthRouter } from "../modules/users/users.routes";
-import { getInfoUser_controller } from "../modules/users/users.controller";
+import { usersAuthRouter, usersProfileRouter } from "../modules/users/users.routes";
+
 
 export const  apiRoute=Router();
 
@@ -8,7 +8,7 @@ export const  apiRoute=Router();
 apiRoute.use("/auth",usersAuthRouter)
 
 // profile
-apiRoute.use("/profile",getInfoUser_controller)
+apiRoute.use("/profile",usersProfileRouter)
 
 
 

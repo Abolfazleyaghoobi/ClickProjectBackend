@@ -3,9 +3,9 @@ import { AppError } from "../../shared/errors/app.error";
 import { hashPassword, verifyPassword } from "../../shared/utils/hashPassword";
 import { UserProfile } from "./entities/userProfile.entity";
 import { User } from "./entities/users.entity";
-import { Login_interface, Register_interface } from "./users.dto";
+import { Login_interface, Register_interface, UpdateProfileDTO } from "./users.dto";
 
-import { usersRepository } from "./users.repository";
+import { profileRepository, usersRepository } from "./users.repository";
 
 // register User
 export const createUser_service = async (data: Register_interface) => {
@@ -28,7 +28,7 @@ export const createUser_service = async (data: Register_interface) => {
     // Create User Profile
     const profile = profileRepository.create({
       user: savedUser,
-      display_name: data.dispaly_name,
+      display_name: data.display_name,
     });
 
     await profileRepository.save(profile);
@@ -111,4 +111,27 @@ export const getInfo_servece = async (id: string) => {
   });
 
   return user;
+};
+
+
+
+
+
+
+export const updateProfile = async (
+    userId: string,
+    data: UpdateProfileDTO
+) => {
+
+    const profile = await profileRepository.findOneBy({
+        user_id: userId
+    });
+
+    if (!profile) {
+        throw new AppError("Profile not found",404);
+    }
+
+    Object.assign(profile, data); 
+
+    return await profileRepository.save(profile);
 };
