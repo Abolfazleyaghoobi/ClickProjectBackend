@@ -1,5 +1,6 @@
 export interface  Register_interface{
   username:string;
+  dispaly_name:string;
   phone:string;
   password:string;
 }

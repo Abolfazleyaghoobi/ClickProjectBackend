@@ -28,7 +28,7 @@ export const createUser_service = async (data: Register_interface) => {
     // Create User Profile
     const profile = profileRepository.create({
       user: savedUser,
-      display_name: savedUser.username,
+      display_name: data.dispaly_name,
     });
 
     await profileRepository.save(profile);
