@@ -17,6 +17,7 @@ import {
 import { mapDatabaseError } from "../../shared/middlewares/mapDatabaseError";
 import { generateToken } from "../../shared/utils/generateJWT";
 import jwt from "jsonwebtoken";
+import { decodeToken } from "../../shared/utils/decode";
 // register User
 
 export const register_controller: RequestHandler = async (req, res, next) => {
@@ -178,16 +179,11 @@ export const updateAccount_controller: RequestHandler = async (
   next,
 ) => {
   try {
-    const token = req.cookies.access_token;
-    const decoded = jwt.decode(token);
-
-    if (!decoded || typeof decoded === "string") {
-      throw new AppError("Invalid token", 401);
-    }
-
+    const resultDecode=decodeToken(req.cookies.access_token)
+    
     const data = UpdateAccountSchema.parse(req.body);
 
-    const result = await updateAccount(decoded.id, data);
+    const result = await updateAccount(resultDecode.id, data);
 
 
     return res.status(200).json({

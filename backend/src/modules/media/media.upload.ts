@@ -8,7 +8,7 @@ import multer from "multer";
 
 const uploadDirectory = path.resolve(
   process.cwd(),
-  "articles-backend/uploads",
+  "backend/upload",
 );
 
 const allowedMimeTypes = new Set([
