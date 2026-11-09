@@ -1,9 +1,16 @@
+import path from "node:path";
+import { unlink } from "node:fs/promises";
 import { AppDataSource } from "../../databases/data-source";
 import { AppError } from "../../shared/errors/app.error";
 import { hashPassword, verifyPassword } from "../../shared/utils/hashPassword";
 import { UserProfile } from "./entities/userProfile.entity";
 import { User } from "./entities/users.entity";
-import { Login_interface, Register_interface, UpdateProfileDTO, UpdateUserDTO } from "./users.dto";
+import {
+  Login_interface,
+  Register_interface,
+  UpdateProfileDTO,
+  UpdateUserDTO,
+} from "./users.dto";
 
 import { profileRepository, usersRepository } from "./users.repository";
 
@@ -115,38 +122,80 @@ export const getInfo_servece = async (id: string) => {
 
 // update profile
 export const updateProfile = async (
-    userId: string,
-    data: UpdateProfileDTO
-) => {
+  userId: string,
+  data: UpdateProfileDTO,
+  files?: {
+  avatar_url?: Express.Multer.File[];
+  banner_url?: Express.Multer.File[];
+}
+  ) => {
 
-    const profile = await profileRepository.findOneBy({
-        user_id: userId
+  const profile = await profileRepository.findOne({
+    where: { user_id: userId },
+  });
+
+  if (!profile) {
+    throw new AppError("Profile not found", 404);
+  }
+  const updateData: Partial<typeof profile> = {};
+  if (data.bio) {
+    updateData.bio = data.bio;
+  }
+  if (data.display_name) {
+    updateData.display_name = data.display_name;
+  }
+
+  if (files!.avatar_url) {
+  
+    
+
+    
+    updateData.avatar_url = `${files!.avatar_url[0].path}`;
+  }
+  if (files!.banner_url) {
+    updateData.banner_url = `${files!.banner_url[0].path}`;
+  }
+  if (!Object.keys(updateData).length) {
+    throw new AppError("no data for update", 400);
+  }
+  await profileRepository.update({ user_id: userId }, updateData);
+
+  const filesToDelete: string[] = [];
+ 
+  if (files!.avatar_url && profile.avatar_url) {
+    filesToDelete.push(profile.avatar_url);
+  }
+
+  if (files!.banner_url && profile.banner_url) {
+    filesToDelete.push(profile.banner_url);
+  }
+
+  for (const file of filesToDelete) {
+    const filename = path.basename(file);
+    const filePath = path.resolve(process.cwd(), "uploads", filename);
+
+    await unlink(filePath).catch(() => {
+      // در صورت نبود فایل، آپدیت دیتابیس همچنان موفق است.
     });
+  }
 
-    if (!profile) {
-        throw new AppError("Profile not found",404);
-    }
-
-    Object.assign(profile, data); 
-
-    return await profileRepository.save(profile);
+  return {
+    success: true,
+    message: "Profile updated successfully",
+  };
 };
 
 // updata account
-export const updateAccount = async (
-    userId: string,
-    data: UpdateUserDTO
-) => {
+export const updateAccount = async (userId: string, data: UpdateUserDTO) => {
+  const profile = await usersRepository.findOneBy({
+    id: userId,
+  });
 
-    const profile = await usersRepository.findOneBy({
-        id: userId
-    });
+  if (!profile) {
+    throw new AppError("Profile not found", 404);
+  }
 
-    if (!profile) {
-        throw new AppError("Profile not found",404);
-    }
+  Object.assign(profile, data);
 
-    Object.assign(profile, data); 
-
-    return await usersRepository.save(profile);
+  return await usersRepository.save(profile);
 };

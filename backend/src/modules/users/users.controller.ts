@@ -141,23 +141,53 @@ export const updateProfile_controller: RequestHandler = async (
   next,
 ) => {
   try {
-    const token = req.cookies.access_token;
-    const decoded = jwt.decode(token);
+    if (req.is("multipart/form-data")) {
+      console.log("ali");
+      
+      const token = req.cookies.access_token;
+      const decoded = jwt.decode(token);
+      const files = req.files as {
+        [fieldname: string]: Express.Multer.File[];
+      };
 
-    if (!decoded || typeof decoded === "string") {
-      throw new AppError("Invalid token", 401);
+      if (!files) {
+        res.status(400).json({
+          success: false,
+          message: "لطفاً یک تصویر ارسال کنید",
+        });
+        return;
+      }
+      if (!decoded || typeof decoded === "string") {
+        throw new AppError("Invalid token", 401);
+      }
+
+      const data = UpdateProfileSchema.parse(req.body);
+
+      const result = await updateProfile(decoded.id, data,files);
+
+      return res.status(200).json({
+        success: true,
+        message: "Profile updated successfully",
+        data: result,
+      });
+    } else {
+      const token = req.cookies.access_token;
+      const decoded = jwt.decode(token);
+
+      if (!decoded || typeof decoded === "string") {
+        throw new AppError("Invalid token", 401);
+      }
+
+      const data = UpdateProfileSchema.parse(req.body);
+
+      const result = await updateProfile(decoded.id, data);
+
+      return res.status(200).json({
+        success: true,
+        message: "Profile updated successfully",
+        data: result,
+      });
     }
-
-    const data = UpdateProfileSchema.parse(req.body);
-
-    const result = await updateProfile(decoded.id, data);
-
-
-    return res.status(200).json({
-      success: true,
-      message: "Profile updated successfully",
-      data: result,
-    });
   } catch (err: any) {
     if (err instanceof ZodError) {
       const zodERR = err.issues.map((issue: any) => ({
@@ -179,12 +209,11 @@ export const updateAccount_controller: RequestHandler = async (
   next,
 ) => {
   try {
-    const resultDecode=decodeToken(req.cookies.access_token)
-    
+    const resultDecode = decodeToken(req.cookies.access_token);
+
     const data = UpdateAccountSchema.parse(req.body);
 
     const result = await updateAccount(resultDecode.id, data);
-
 
     return res.status(200).json({
       success: true,
