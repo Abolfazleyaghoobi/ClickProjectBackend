@@ -115,12 +115,13 @@ export const getInfoUser_controller: RequestHandler = async (
       return next(new AppError("token is not found", 401));
     }
     const decoded = jwt.decode(cookeId);
-
+    
     if (!decoded || typeof decoded === "string") {
       throw new AppError("Invalid token", 401);
     }
+    console.log('decoded', decoded)
 
-    const result = await getInfo_servece(decoded.id);
+    const result = await getInfo_servece({ id: decoded.id });
     // console.log('result', result)
 
     res.status(200).json({
@@ -150,7 +151,6 @@ export const getInfoUserByUsername_controller: RequestHandler = async (req,res,n
 
 
 // update profile
-
 export const updateProfile_controller: RequestHandler = async (
   req,
   res,
