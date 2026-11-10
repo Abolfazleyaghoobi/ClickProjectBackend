@@ -133,6 +133,22 @@ export const getInfoUser_controller: RequestHandler = async (
   }
 };
 
+// get info for username
+export const getInfoUserByUsername_controller: RequestHandler = async (req,res,next)=>{
+  try {
+ const username = req.params.username;
+    const result = await getInfo_servece({ username });
+    res.status(200).json({
+      success: true,
+      message: "Get info user successfully",
+      data: result,
+    });
+  } catch (err: any) {
+    return next(mapDatabaseError(err));
+  }
+}
+
+
 // update profile
 
 export const updateProfile_controller: RequestHandler = async (
@@ -142,7 +158,7 @@ export const updateProfile_controller: RequestHandler = async (
 ) => {
   try {
     if (req.is("multipart/form-data")) {
-      console.log("ali");
+    
       
       const token = req.cookies.access_token;
       const decoded = jwt.decode(token);
@@ -170,24 +186,7 @@ export const updateProfile_controller: RequestHandler = async (
         message: "Profile updated successfully",
         data: result,
       });
-    } else {
-      const token = req.cookies.access_token;
-      const decoded = jwt.decode(token);
-
-      if (!decoded || typeof decoded === "string") {
-        throw new AppError("Invalid token", 401);
-      }
-
-      const data = UpdateProfileSchema.parse(req.body);
-
-      const result = await updateProfile(decoded.id, data);
-
-      return res.status(200).json({
-        success: true,
-        message: "Profile updated successfully",
-        data: result,
-      });
-    }
+    } 
   } catch (err: any) {
     if (err instanceof ZodError) {
       const zodERR = err.issues.map((issue: any) => ({

@@ -25,3 +25,9 @@ export interface UpdateUserDTO {
     phone?: string;
   
 }
+
+// get info user
+export interface GetInfoUserDTO {
+    id?: string;
+    username?: string| string[];
+}

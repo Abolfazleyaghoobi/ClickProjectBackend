@@ -6,6 +6,7 @@ import { hashPassword, verifyPassword } from "../../shared/utils/hashPassword";
 import { UserProfile } from "./entities/userProfile.entity";
 import { User } from "./entities/users.entity";
 import {
+  GetInfoUserDTO,
   Login_interface,
   Register_interface,
   UpdateProfileDTO,
@@ -93,9 +94,19 @@ export const login_service = async (data: Login_interface) => {
 };
 
 // get info user
-export const getInfo_servece = async (id: string) => {
+export const getInfo_servece = async (data: GetInfoUserDTO) => {
+  if (!data.id && !data.username) {
+    throw new AppError("id or username is required", 400);
+  }
+  if (data.username && typeof data.username !== "string") {
+    throw new AppError("Invalid username", 400);
+  }
+
   const user = await usersRepository.findOne({
-    where: { id },
+    where: {
+      ...(data.id && { id: data.id }),
+      ...(data.username && { username: data.username }),
+    },
     relations: {
       profile: true,
     },
@@ -125,11 +136,10 @@ export const updateProfile = async (
   userId: string,
   data: UpdateProfileDTO,
   files?: {
-  avatar_url?: Express.Multer.File[];
-  banner_url?: Express.Multer.File[];
-}
-  ) => {
-
+    avatar_url?: Express.Multer.File[];
+    banner_url?: Express.Multer.File[];
+  },
+) => {
   const profile = await profileRepository.findOne({
     where: { user_id: userId },
   });
@@ -146,10 +156,6 @@ export const updateProfile = async (
   }
 
   if (files!.avatar_url) {
-  
-    
-
-    
     updateData.avatar_url = `${files!.avatar_url[0].path}`;
   }
   if (files!.banner_url) {
@@ -161,7 +167,7 @@ export const updateProfile = async (
   await profileRepository.update({ user_id: userId }, updateData);
 
   const filesToDelete: string[] = [];
- 
+
   if (files!.avatar_url && profile.avatar_url) {
     filesToDelete.push(profile.avatar_url);
   }
