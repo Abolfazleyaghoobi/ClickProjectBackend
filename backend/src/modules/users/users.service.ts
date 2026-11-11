@@ -16,6 +16,8 @@ import {
 import { profileRepository, usersRepository } from "./users.repository";
 import { UserToken } from "./entities/accountToken.entity";
 import { generateAccountToken } from "../../shared/utils/generateTokenAccount";
+import { UserAchievement } from "./entities/UserAchievement.entity";
+import { AchievementDefinition } from "../achievement/entity/achievement.entity";
 
 // register User
 export const createUser_service = async (data: Register_interface) => {
@@ -51,6 +53,9 @@ export const createUser_service = async (data: Register_interface) => {
       label: "Account Token",
     });
 
+    // generate user achievement
+    
+
     await profileRepository.save(profile);
     await userTokenRepository.save(userToken);
     // Return User Data
@@ -77,6 +82,7 @@ export const createUser_service = async (data: Register_interface) => {
         prefix: userToken.prefix,
         label: userToken.label,
       },
+      achievements: [],
     };
   });
 };

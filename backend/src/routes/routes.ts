@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { usersAuthRouter, usersProfileRouter } from "../modules/users/users.routes";
 import { mediaRouter } from "../modules/media/media.route";
+import { achievementRouter } from "../modules/achievement/achievement.route";
 
 
 export const  apiRoute=Router();
@@ -15,6 +16,8 @@ apiRoute.use("/profile",usersProfileRouter)
 apiRoute.use("/upload",mediaRouter)
 
 
+// achievement
+apiRoute.use("/achievement",achievementRouter)
 
 
 

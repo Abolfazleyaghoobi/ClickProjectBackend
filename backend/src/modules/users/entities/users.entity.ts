@@ -6,10 +6,12 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   Index,
+  OneToMany,
 } from "typeorm";
 import { OneToOne } from "typeorm";
 import { UserProfile } from "./userProfile.entity";
 import { UserToken } from "./accountToken.entity";
+import { UserAchievement } from "./UserAchievement.entity";
 
 export enum UserRole {
   USER = "user",
@@ -83,6 +85,9 @@ export class User {
   
   @OneToOne(() => UserToken, (profile: UserToken) => profile.user)
   AccountToken!: UserToken;
+
+   @OneToMany(() => UserAchievement, (profile: UserAchievement) => profile.user)
+  Achivement!:  UserAchievement[];
 
   @Column({
     type: "datetime",
