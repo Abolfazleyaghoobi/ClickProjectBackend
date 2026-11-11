@@ -47,34 +47,34 @@ export class UserProfile {
 
   @Column({
     type: "text",
-     length: 400,
+    
     nullable: true,
   })
   bio!: string | null;
 
   @Column({
   type: "text",
-    length: 150,
+   
     nullable: true
   })
   github_url!: string | null;
   @Column({
     type: "text",
-    length: 150,
+
     nullable: true
   })
   portolio_url!: string | null;
 
   @Column({
     type: "text",
-    length: 255,
+
     nullable: true,
   })
   avatar_url!: string | null;
 
   @Column({
     type: "text",
-    length: 255,
+  
     nullable: true,
   })
   banner_url!: string | null;
