@@ -14,12 +14,16 @@ import {
 } from "./users.dto";
 
 import { profileRepository, usersRepository } from "./users.repository";
+import { UserToken } from "./entities/accountToken.entity";
+import { generateAccountToken } from "../../shared/utils/generateTokenAccount";
 
 // register User
 export const createUser_service = async (data: Register_interface) => {
   return await AppDataSource.transaction(async (manager: any) => {
     const userRepository = manager.getRepository(User);
     const profileRepository = manager.getRepository(UserProfile);
+    const userTokenRepository = manager.getRepository(UserToken);
+    const { rawToken, prefix } = generateAccountToken();
 
     // Hash Password
     const passwordHash = await hashPassword(data.password);
@@ -39,8 +43,16 @@ export const createUser_service = async (data: Register_interface) => {
       display_name: data.display_name,
     });
 
-    await profileRepository.save(profile);
+    // generate account token
+    const userToken = userTokenRepository.create({
+      user: savedUser,
+      token_Raw: rawToken,
+      prefix: prefix,
+      label: "Account Token",
+    });
 
+    await profileRepository.save(profile);
+    await userTokenRepository.save(userToken);
     // Return User Data
     return {
       id: savedUser.id,
@@ -58,6 +70,11 @@ export const createUser_service = async (data: Register_interface) => {
         avatar_url: profile.avatar_url,
         banner_url: profile.banner_url,
       },
+      userToken: {
+        rawToken: userToken.token_Raw,
+        prefix: userToken.prefix,
+        label: userToken.label,
+      }
     };
   });
 };
@@ -109,6 +126,7 @@ export const getInfo_servece = async (data: GetInfoUserDTO) => {
     },
     relations: {
       profile: true,
+      AccountToken: true,
     },
     select: {
       id: true,
@@ -125,6 +143,11 @@ export const getInfo_servece = async (data: GetInfoUserDTO) => {
         avatar_url: true,
         banner_url: true,
       },
+      AccountToken: {
+        token_Raw: true,
+        prefix: true,
+        label: true,
+      }
     },
   });
 

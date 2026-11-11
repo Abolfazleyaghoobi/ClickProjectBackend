@@ -6,3 +6,20 @@
 برای ساخت جدول از میگرشن 
 
 ❯ npx tsx ./node_modules/typeorm/cli.js migration:run -d backend/src/databases/data-source.ts
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+tuv_61ecd9aad2e7fbb677de6769350cf2f5d272870414eb638e0a606ca412a4e218
+
+tuv_76c4b08e29a553c3c47d394962b981e669526c924337e16aa5b94df84795fdf0

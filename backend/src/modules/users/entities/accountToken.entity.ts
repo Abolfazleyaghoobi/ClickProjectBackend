@@ -41,7 +41,7 @@ export class UserToken {
         length: 255,
         select: false,
     })
-    token_hash!: string | null;
+    token_Raw!: string | null;
 
     @Column({
         type: "varchar",

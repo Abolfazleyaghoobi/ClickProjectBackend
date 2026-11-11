@@ -17,6 +17,7 @@ usersAuthRouter.post("/login",login_controller)
 
 // get all profile
 usersProfileRouter.get("/",authenticate,getInfoUser_controller)
+// get profile by username
 usersProfileRouter.get("/:username",getInfoUserByUsername_controller)
 
 

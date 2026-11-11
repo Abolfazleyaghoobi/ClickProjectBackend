@@ -9,6 +9,7 @@ import {
 } from "typeorm";
 import { OneToOne } from "typeorm";
 import { UserProfile } from "./userProfile.entity";
+import { UserToken } from "./accountToken.entity";
 
 export enum UserRole {
   USER = "user",
@@ -83,6 +84,8 @@ export class User {
 
   @OneToOne(() => UserProfile, (profile:UserProfile) => profile.user)
   profile!: UserProfile;
+   @OneToOne(() => UserToken, (profile:UserToken) => profile.user)
+  AccountToken!: UserToken;
 
   @Column({
     type: "datetime",
