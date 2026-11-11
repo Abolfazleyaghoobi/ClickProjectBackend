@@ -142,6 +142,8 @@ export const getInfo_servece = async (data: GetInfoUserDTO) => {
         bio: true,
         avatar_url: true,
         banner_url: true,
+        github_url: true,
+        portolio_url: true,
       },
       AccountToken: {
         token_Raw: Boolean(data.id),
