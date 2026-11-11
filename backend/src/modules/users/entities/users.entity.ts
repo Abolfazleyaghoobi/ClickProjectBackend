@@ -80,6 +80,7 @@ export class User {
 
   @OneToOne(() => UserProfile, (profile: UserProfile) => profile.user)
   profile!: UserProfile;
+  
   @OneToOne(() => UserToken, (profile: UserToken) => profile.user)
   AccountToken!: UserToken;
 
