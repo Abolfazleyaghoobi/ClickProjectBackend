@@ -67,6 +67,8 @@ export const createUser_service = async (data: Register_interface) => {
       profile: {
         display_name: profile.display_name,
         bio: profile.bio,
+        github_url: profile.github_url,
+        portolio_url: profile.portolio_url,
         avatar_url: profile.avatar_url,
         banner_url: profile.banner_url,
       },

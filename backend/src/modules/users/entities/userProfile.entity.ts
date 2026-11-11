@@ -47,21 +47,21 @@ export class UserProfile {
 
   @Column({
     type: "text",
-    
+
     nullable: true,
   })
   bio!: string | null;
 
   @Column({
-  type: "text",
-   
-    nullable: true
+    type: "text",
+
+    nullable: true,
   })
   github_url!: string | null;
   @Column({
     type: "text",
 
-    nullable: true
+    nullable: true,
   })
   portolio_url!: string | null;
 
@@ -74,7 +74,7 @@ export class UserProfile {
 
   @Column({
     type: "text",
-  
+
     nullable: true,
   })
   banner_url!: string | null;
