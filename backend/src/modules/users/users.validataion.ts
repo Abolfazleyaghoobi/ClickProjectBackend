@@ -22,7 +22,11 @@ export const LoginUserSchema = z.object({
 
 export const UpdateProfileSchema = z.object({
     display_name: z.string().min(3).max(60).optional(),
-    bio: z.string().optional()
+    bio: z.string().optional(),
+    avatar_url: z.string().url().optional(),
+    banner_url: z.string().url().optional(),
+    github_url: z.string().url().optional(),
+    portolio_url: z.string().url().optional(),
 })
 
 export const UpdateAccountSchema = z.object({

@@ -16,6 +16,8 @@ export interface UpdateProfileDTO {
     bio?: string | null;
     avatar_url?: string | null;
     banner_url?: string | null;
+    github_url?: string | null;
+    portolio_url?: string | null;
 }
 
 

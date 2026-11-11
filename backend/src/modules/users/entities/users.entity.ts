@@ -26,9 +26,6 @@ export enum UserStatus {
 @Index("UQ_users_phone", ["phone"], {
   unique: true,
 })
-
-
-
 export class User {
   @PrimaryGeneratedColumn({
     type: "bigint",
@@ -81,10 +78,9 @@ export class User {
   @Column({ type: "int", unsigned: true, default: 0 })
   step_balance!: number;
 
-
-  @OneToOne(() => UserProfile, (profile:UserProfile) => profile.user)
+  @OneToOne(() => UserProfile, (profile: UserProfile) => profile.user)
   profile!: UserProfile;
-   @OneToOne(() => UserToken, (profile:UserToken) => profile.user)
+  @OneToOne(() => UserToken, (profile: UserToken) => profile.user)
   AccountToken!: UserToken;
 
   @Column({
@@ -93,8 +89,6 @@ export class User {
   })
   phone_verified_at!: Date | null;
 
-
-  
   @Column({
     type: "datetime",
     nullable: true,

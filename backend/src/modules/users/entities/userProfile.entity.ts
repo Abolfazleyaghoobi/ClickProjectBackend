@@ -52,6 +52,17 @@ export class UserProfile {
   bio!: string | null;
 
   @Column({
+    type: "varchar",
+    length: 150,
+  })
+  github_url!: string | null;
+  @Column({
+    type: "varchar",
+    length: 150,
+  })
+  portolio_url!: string | null;
+
+  @Column({
     type: "text",
     nullable: true,
   })

@@ -74,7 +74,7 @@ export const createUser_service = async (data: Register_interface) => {
         rawToken: userToken.token_Raw,
         prefix: userToken.prefix,
         label: userToken.label,
-      }
+      },
     };
   });
 };
@@ -144,10 +144,10 @@ export const getInfo_servece = async (data: GetInfoUserDTO) => {
         banner_url: true,
       },
       AccountToken: {
-        token_Raw: true,
+        token_Raw: Boolean(data.id),
         prefix: true,
         label: true,
-      }
+      },
     },
   });
 
@@ -183,6 +183,12 @@ export const updateProfile = async (
   }
   if (files!.banner_url) {
     updateData.banner_url = `${files!.banner_url[0].path}`;
+  }
+  if (data.github_url) {
+    updateData.github_url = data.github_url;
+  }
+  if (data.portolio_url) {
+    updateData.portolio_url = data.portolio_url;
   }
   if (!Object.keys(updateData).length) {
     throw new AppError("no data for update", 400);
