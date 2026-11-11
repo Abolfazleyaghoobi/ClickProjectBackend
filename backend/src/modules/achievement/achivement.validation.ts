@@ -17,4 +17,9 @@ export const UpdateAchivementSchema = z.object({
     conditionType: z.string().min(3).max(50).optional(),
     conditionValue: z.number().int().positive().optional(),
     isActive: z.boolean().optional(),
-});
+}).refine(
+    (data) => Object.keys(data).length >= 1,
+    {
+        message: "At least one field must be provided",
+    }
+);
