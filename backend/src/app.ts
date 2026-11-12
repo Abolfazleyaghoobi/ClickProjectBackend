@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
-
+import path from "node:path";
 import { env } from "./configs/env";
 import { appConfig } from "./configs/app.config";
 import { apiRoute } from "./routes/routes";
@@ -23,7 +23,10 @@ app.use(appConfig.apiPrefix,apiRoute)
 
 
 // upload files
-app.use("/uploads", express.static("articles-backend/uploads"))
+app.use(
+  "/uploads",
+  express.static(path.resolve(process.cwd(), "backend/upload")),
+);
 
 
 

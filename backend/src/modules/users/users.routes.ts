@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {  createProject_controller, deleteProject_controller, getInfoUser_controller, getInfoUserByUsername_controller, login_controller, register_controller, updateAccount_controller, updateProfile_controller, updateProject_controller } from "./users.controller";
+import {  createProject_controller, deleteProject_controller, getInfoUser_controller, getInfoUserByUsername_controller, login_controller, logout_controller, register_controller, sendCodeForChange_controller, updateAccount_controller, updateProfile_controller, updateProject_controller, verifyCodeForChange_controller } from "./users.controller";
 import { authenticate } from "../../shared/middlewares/auth.middleware";
 import { imageUpload } from "../media/media.upload";
 import { validateImageContent } from "../media/media.validation";
@@ -15,6 +15,14 @@ usersAuthRouter.post("/register",register_controller)
 
 // login user
 usersAuthRouter.post("/login",login_controller)
+// logout user
+usersAuthRouter.post("/logout",logout_controller)
+
+// send code for change phone number
+usersProfileRouter.post("/sendCodeForChange",authenticate,sendCodeForChange_controller)
+
+// verify code for change phone number
+usersProfileRouter.post("/verifyCodeForChange",authenticate,verifyCodeForChange_controller)
 
 // get all profile
 usersProfileRouter.get("/",authenticate,getInfoUser_controller)

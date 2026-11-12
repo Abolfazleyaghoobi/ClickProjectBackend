@@ -15,10 +15,16 @@ import {
   UpdateUserDTO,
 } from "./users.dto";
 
-import { profileRepository, projectRepository, usersRepository } from "./users.repository";
+import {
+  PhoneVerificationCodeRepository,
+  profileRepository,
+  projectRepository,
+  usersRepository,
+} from "./users.repository";
 import { UserToken } from "./entities/accountToken.entity";
 import { generateAccountToken } from "../../shared/utils/generateTokenAccount";
-
+import { generateOtp } from "../../shared/utils/generateOPT";
+import { IsNull, MoreThan } from "typeorm";
 
 // register User
 export const createUser_service = async (data: Register_interface) => {
@@ -55,7 +61,6 @@ export const createUser_service = async (data: Register_interface) => {
     });
 
     // generate user achievement
-    
 
     await profileRepository.save(profile);
     await userTokenRepository.save(userToken);
@@ -82,7 +87,7 @@ export const createUser_service = async (data: Register_interface) => {
         rawToken: userToken.token_Raw,
         prefix: userToken.prefix,
         label: userToken.label,
-      }
+      },
     };
   });
 };
@@ -195,11 +200,12 @@ export const updateProfile_service = async (
     updateData.display_name = data.display_name;
   }
 
-  if (files!.avatar_url) {
-    updateData.avatar_url = `${files!.avatar_url[0].path}`;
+  if (files?.avatar_url?.[0]) {
+    updateData.avatar_url = `/uploads/${files.avatar_url[0].filename}`;
   }
-  if (files!.banner_url) {
-    updateData.banner_url = `${files!.banner_url[0].path}`;
+
+  if (files?.banner_url?.[0]) {
+    updateData.banner_url = `/uploads/${files.banner_url[0].filename}`;
   }
   if (data.github_url) {
     updateData.github_url = data.github_url;
@@ -224,8 +230,7 @@ export const updateProfile_service = async (
 
   for (const file of filesToDelete) {
     const filename = path.basename(file);
-    const filePath = path.resolve(process.cwd(), "uploads", filename);
-
+    const filePath = path.resolve(process.cwd(), "backend/upload", filename);
     await unlink(filePath).catch(() => {
       // در صورت نبود فایل، آپدیت دیتابیس همچنان موفق است.
     });
@@ -238,22 +243,109 @@ export const updateProfile_service = async (
 };
 
 // updata account
-export const updateAccount_service = async (userId: string, data: UpdateUserDTO) => {
-  const profile = await usersRepository.findOneBy({
+export const updateAccount_service = async (
+  userId: string,
+  data: UpdateUserDTO,
+) => {
+  const user = await usersRepository.findOneBy({
     id: userId,
   });
 
-  if (!profile) {
+  if (!user) {
     throw new AppError("Profile not found", 404);
   }
 
-  Object.assign(profile, data);
+  if (!user.changeNumber) {
+    throw new AppError("you can not change number", 403);
+  }
 
-  return await usersRepository.save(profile);
+  user.changeNumber = false;
+
+  Object.assign(user, data);
+
+  await usersRepository.save(user);
+
+  return user;
+};
+
+//  send code for change phone number
+export const sendCodeForChange_service = async (userId: string) => {
+  const checkOtp = await PhoneVerificationCodeRepository.findOne({
+    where: {
+      user: { id: userId },
+    },
+  });
+  if (checkOtp) {
+    throw new AppError("شما قبلاً درخواست کد داده‌اید", 400);
+  }
+  const user = await usersRepository.findOneBy({ id: userId });
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+
+  // generate code
+  const code = generateOtp();
+
+  // save code in database
+  const otp = PhoneVerificationCodeRepository.create({
+    user: user,
+
+    code: code,
+    expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    attempts: 0,
+    consumed_at: null,
+  });
+
+  await PhoneVerificationCodeRepository.save(otp);
+
+  return {
+    success: true,
+    message: "Code sent successfully",
+    code: code,
+  };
+};
+
+//  verify code for change phone number
+export const verifyCodeForChange_service = async (
+  userId: string,
+  code: string,
+) => {
+  const user = await usersRepository.findOneBy({ id: userId });
+
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+
+  const otp = await PhoneVerificationCodeRepository.findOne({
+    where: {
+      user: { id: userId },
+      code: code,
+      consumed_at: IsNull(),
+      expires_at: MoreThan(new Date()),
+    },
+  });
+
+  if (!otp) {
+    throw new AppError("Invalid or expired code", 400);
+  }
+
+  user.changeNumber = true;
+  await usersRepository.save(user);
+  // mark the code as consumed
+  otp.consumed_at = new Date();
+  await PhoneVerificationCodeRepository.remove(otp);
+
+  return {
+    success: true,
+    message: "Code verified successfully",
+  };
 };
 
 // create project
-export const createProject_service = async (userId: string, data: CreateProjectDTO) => {
+export const createProject_service = async (
+  userId: string,
+  data: CreateProjectDTO,
+) => {
   const user = await usersRepository.findOneBy({ id: userId });
   if (!user) {
     throw new AppError("User not found", 404);
@@ -267,19 +359,22 @@ export const createProject_service = async (userId: string, data: CreateProjectD
 
   await projectRepository.save(project);
 
-  const responce_custom={
+  const responce_custom = {
     id: project.id,
     title: project.title,
     description: project.description,
-    project_url: project.project_url
-  }
+    project_url: project.project_url,
+  };
 
   return responce_custom;
-}
+};
 
 // update project
-export const updateProject_service = async (projectId: number, data: UpdateProjectDTO) => {
-  if(typeof projectId !== "number"){
+export const updateProject_service = async (
+  projectId: number,
+  data: UpdateProjectDTO,
+) => {
+  if (typeof projectId !== "number") {
     throw new AppError("Invalid projectId", 400);
   }
   const project = await projectRepository.findOneBy({ id: projectId });
@@ -295,7 +390,7 @@ export const updateProject_service = async (projectId: number, data: UpdateProje
 
 // delete project
 export const deleteProject_service = async (projectId: number) => {
-  if(typeof projectId !== "number"){
+  if (typeof projectId !== "number") {
     throw new AppError("Invalid projectId", 400);
   }
   const project = await projectRepository.findOneBy({ id: projectId });
@@ -307,4 +402,4 @@ export const deleteProject_service = async (projectId: number) => {
   await projectRepository.remove(project);
 
   return { message: "Project deleted successfully" };
-}
+};

@@ -13,6 +13,7 @@ import { UserProfile } from "./userProfile.entity";
 import { UserToken } from "./accountToken.entity";
 import { UserAchievement } from "./UserAchievement.entity";
 import { Project } from "./userProject.entity";
+import { PhoneVerificationCode } from "./PhoneVerificationCode.entity";
 
 export enum UserRole {
   USER = "user",
@@ -78,20 +79,28 @@ export class User {
   @Column({ type: "int", unsigned: true, default: 1000 })
   xp_to_next_level!: number;
 
+   @Column({ type: "boolean", unsigned: true, default: false })
+  changeNumber!: boolean;
+
+
+
   @Column({ type: "int", unsigned: true, default: 0 })
   step_balance!: number;
 
   @OneToOne(() => UserProfile, (profile: UserProfile) => profile.user)
   profile!: UserProfile;
-  
+
   @OneToOne(() => UserToken, (profile: UserToken) => profile.user)
   AccountToken!: UserToken;
 
-   @OneToMany(() => UserAchievement, (profile: UserAchievement) => profile.user)
-  Achivement!:  UserAchievement[];
+  @OneToMany(() => UserAchievement, (profile: UserAchievement) => profile.user)
+  Achivement!: UserAchievement[];
 
-  @OneToMany(()=> Project,(project:Project)=>project.user)
+  @OneToMany(() => Project, (project: Project) => project.user)
   projects!: Project[];
+  @OneToMany(() => PhoneVerificationCode, (otp) => otp.user)
+  phone_verification_codes!: PhoneVerificationCode[];
+
 
   @Column({
     type: "datetime",

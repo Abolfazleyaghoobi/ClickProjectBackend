@@ -16,9 +16,11 @@ import {
   deleteProject_service,
   getInfo_servece,
   login_service,
+  sendCodeForChange_service,
   updateAccount_service,
   updateProfile_service,
   updateProject_service,
+  verifyCodeForChange_service,
   
   
 } from "./users.service";
@@ -110,8 +112,25 @@ export const login_controller: RequestHandler = async (req, res, next) => {
   }
 };
 
-// get info user
+// logout user
+export const logout_controller: RequestHandler = async (req, res, next) => {
+  try {
+    res.clearCookie("access_token", {
+      httpOnly: true,
+      secure: false, // فقط محیط توسعه
+      sameSite: "lax",  
+      path: "/",
+    });
 
+    res.status(200).json({
+      success: true,
+      message: "User logout successfully",
+    });
+  } catch (err: any) {
+    return next(mapDatabaseError(err));
+  } 
+}
+// get info user
 export const getInfoUser_controller: RequestHandler = async (
   req,
   res,
@@ -122,7 +141,7 @@ export const getInfoUser_controller: RequestHandler = async (
     if (!cookeId) {
       return next(new AppError("token is not found", 401));
     }
-    const decoded = jwt.decode(cookeId);
+    const decoded = decodeToken(cookeId);
     
     if (!decoded || typeof decoded === "string") {
       throw new AppError("Invalid token", 401);
@@ -141,7 +160,61 @@ export const getInfoUser_controller: RequestHandler = async (
     return next(mapDatabaseError(err));
   }
 };
+// send code for change phone number
+export const sendCodeForChange_controller: RequestHandler = async (req, res, next) => {
+  try {
+    const cookeId = req.cookies.access_token;
+    if (!cookeId) {
+      return next(new AppError("token is not found", 401));
+    }
+    const decoded = decodeToken(cookeId);
+    
+    if (!decoded || typeof decoded === "string") {
+      throw new AppError("Invalid token", 401);
+    }
 
+    const result = await sendCodeForChange_service(decoded.id);
+
+    res.status(200).json({
+      success: true,
+      message: "Code sent successfully",
+      data: result,
+    });
+  } catch (err: any) {
+    return next(mapDatabaseError(err));
+  }
+};
+
+// verify code for change phone number
+export const verifyCodeForChange_controller: RequestHandler = async (req, res, next) => {
+  try {
+    const cookeId = req.cookies.access_token;
+    if (!cookeId) {
+      return next(new AppError("token is not found", 401));
+    }
+    const decoded = decodeToken(cookeId);
+    
+    if (!decoded || typeof decoded === "string") {
+      throw new AppError("Invalid token", 401);
+    }
+
+    const { code } = req.body;
+
+    if (!code) {
+      throw new AppError("Code is required", 400);
+    }
+
+    const result = await verifyCodeForChange_service(decoded.id, code);
+
+    res.status(200).json({
+      success: true,
+      message: "Code verified successfully",
+      data: result,
+    });
+  } catch (err: any) {
+    return next(mapDatabaseError(err));
+  }
+}
 // get info for username
 export const getInfoUserByUsername_controller: RequestHandler = async (req,res,next)=>{
   try {
@@ -169,7 +242,7 @@ export const updateProfile_controller: RequestHandler = async (
     
       
       const token = req.cookies.access_token;
-      const decoded = jwt.decode(token);
+      const decoded = decodeToken(token);
       const files = req.files as {
         [fieldname: string]: Express.Multer.File[];
       };
@@ -217,9 +290,9 @@ export const updateAccount_controller: RequestHandler = async (
 ) => {
   try {
     const resultDecode = decodeToken(req.cookies.access_token);
-
+  
     const data = UpdateAccountSchema.parse(req.body);
-
+   
     const result = await updateAccount_service(resultDecode.id, data);
 
     return res.status(200).json({
@@ -240,6 +313,7 @@ export const updateAccount_controller: RequestHandler = async (
     return next(mapDatabaseError(err));
   }
 };
+
 
 
 // create project
@@ -306,3 +380,5 @@ export const deleteProject_controller: RequestHandler = async (req,res,next)=>{
     return next(mapDatabaseError(err));
   }
 }
+
+

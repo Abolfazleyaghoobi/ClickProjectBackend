@@ -24,8 +24,6 @@ export interface UpdateProfileDTO {
 // update user account
 export interface UpdateUserDTO {
     username?: string;
-    phone?: string;
-  
 }
 
 // get info user
