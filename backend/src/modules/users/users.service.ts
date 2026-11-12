@@ -301,7 +301,6 @@ export const sendCodeForChange_service = async (userId: string) => {
   return {
     success: true,
     message: "Code sent successfully",
-    code: code,
   };
 };
 
