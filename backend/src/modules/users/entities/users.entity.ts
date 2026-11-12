@@ -12,6 +12,7 @@ import { OneToOne } from "typeorm";
 import { UserProfile } from "./userProfile.entity";
 import { UserToken } from "./accountToken.entity";
 import { UserAchievement } from "./UserAchievement.entity";
+import { Project } from "./userProject.entity";
 
 export enum UserRole {
   USER = "user",
@@ -88,6 +89,9 @@ export class User {
 
    @OneToMany(() => UserAchievement, (profile: UserAchievement) => profile.user)
   Achivement!:  UserAchievement[];
+
+  @OneToMany(()=> Project,(project:Project)=>project.user)
+  projects!: Project[];
 
   @Column({
     type: "datetime",

@@ -1,18 +1,26 @@
 import type { RequestHandler } from "express";
 import {
+  CreateProjectSchema,
   CreateUserSchema,
   LoginUserSchema,
   UpdateAccountSchema,
   UpdateProfileSchema,
+  UpdateProjectSchema,
 } from "./users.validataion";
 import { AppError } from "../../shared/errors/app.error";
 import { string, ZodError } from "zod";
 import {
+  createProject_service,
   createUser_service,
+ 
+  deleteProject_service,
   getInfo_servece,
   login_service,
-  updateAccount,
-  updateProfile,
+  updateAccount_service,
+  updateProfile_service,
+  updateProject_service,
+  
+  
 } from "./users.service";
 import { mapDatabaseError } from "../../shared/middlewares/mapDatabaseError";
 import { generateToken } from "../../shared/utils/generateJWT";
@@ -38,7 +46,7 @@ export const register_controller: RequestHandler = async (req, res, next) => {
       secure: false, // فقط محیط توسعه
       sameSite: "lax",
       path: "/",
-      maxAge: 70 * 60 * 1000, // 15 دقیقه
+      maxAge: 10080 * 60 * 1000, // 15 دقیقه
     });
 
     // Response
@@ -79,7 +87,7 @@ export const login_controller: RequestHandler = async (req, res, next) => {
       secure: false, // فقط محیط توسعه
       sameSite: "lax",
       path: "/",
-      maxAge: 70 * 60 * 1000, // 15 دقیقه
+      maxAge: 10080 * 60 * 1000, // 15 دقیقه
     });
 
     // Response
@@ -119,7 +127,7 @@ export const getInfoUser_controller: RequestHandler = async (
     if (!decoded || typeof decoded === "string") {
       throw new AppError("Invalid token", 401);
     }
-    console.log('decoded', decoded)
+
 
     const result = await getInfo_servece({ id: decoded.id });
     // console.log('result', result)
@@ -179,7 +187,7 @@ export const updateProfile_controller: RequestHandler = async (
 
       const data = UpdateProfileSchema.parse(req.body);
 
-      const result = await updateProfile(decoded.id, data,files);
+      const result = await updateProfile_service(decoded.id, data,files);
 
       return res.status(200).json({
         success: true,
@@ -212,7 +220,7 @@ export const updateAccount_controller: RequestHandler = async (
 
     const data = UpdateAccountSchema.parse(req.body);
 
-    const result = await updateAccount(resultDecode.id, data);
+    const result = await updateAccount_service(resultDecode.id, data);
 
     return res.status(200).json({
       success: true,
@@ -232,3 +240,69 @@ export const updateAccount_controller: RequestHandler = async (
     return next(mapDatabaseError(err));
   }
 };
+
+
+// create project
+export const createProject_controller: RequestHandler = async (req,res,next)=>{
+  try {
+    const resultDecode = decodeToken(req.cookies.access_token);
+    const data = CreateProjectSchema.parse(req.body);
+    const result = await createProject_service(resultDecode.id,data);
+    return res.status(201).json({
+      success: true,
+      message: "Project created successfully",
+      data: result,
+    });
+  } catch (err: any) {
+    if (err instanceof ZodError) {
+      const zodERR = err.issues.map((issue: any) => ({
+        field: issue.path.join("."),
+        message: issue.message,
+      }));
+
+      throw new AppError("Validation failed", 400, { errors: zodERR });
+    }
+
+    return next(mapDatabaseError(err));
+  }
+}
+
+// update project
+export const updateProject_controller: RequestHandler = async (req,res,next)=>{
+  try {
+    const projectId = Number(req.params.id);
+    const data = UpdateProjectSchema.parse(req.body);
+    const result = await updateProject_service(projectId,data);
+    return res.status(200).json({
+      success: true,
+      message: "Project updated successfully",
+      data: result,
+    });
+  } catch (err: any) {
+    if (err instanceof ZodError) {
+      const zodERR = err.issues.map((issue: any) => ({
+        field: issue.path.join("."),
+        message: issue.message,
+      }));
+
+      throw new AppError("Validation failed", 400, { errors: zodERR });
+    }
+
+    return next(mapDatabaseError(err));
+  }
+}
+
+// delete project
+export const deleteProject_controller: RequestHandler = async (req,res,next)=>{
+  try {
+    const projectId = Number(req.params.id);
+    const result = await deleteProject_service(projectId);
+    return res.status(200).json({
+      success: true,
+      message: result,
+  
+    });
+  } catch (err: any) {
+    return next(mapDatabaseError(err));
+  }
+}

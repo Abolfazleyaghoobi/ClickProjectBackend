@@ -6,18 +6,19 @@ import { hashPassword, verifyPassword } from "../../shared/utils/hashPassword";
 import { UserProfile } from "./entities/userProfile.entity";
 import { User } from "./entities/users.entity";
 import {
+  CreateProjectDTO,
   GetInfoUserDTO,
   Login_interface,
   Register_interface,
   UpdateProfileDTO,
+  UpdateProjectDTO,
   UpdateUserDTO,
 } from "./users.dto";
 
-import { profileRepository, usersRepository } from "./users.repository";
+import { profileRepository, projectRepository, usersRepository } from "./users.repository";
 import { UserToken } from "./entities/accountToken.entity";
 import { generateAccountToken } from "../../shared/utils/generateTokenAccount";
-import { UserAchievement } from "./entities/UserAchievement.entity";
-import { AchievementDefinition } from "../achievement/entity/achievement.entity";
+
 
 // register User
 export const createUser_service = async (data: Register_interface) => {
@@ -81,8 +82,7 @@ export const createUser_service = async (data: Register_interface) => {
         rawToken: userToken.token_Raw,
         prefix: userToken.prefix,
         label: userToken.label,
-      },
-      achievements: [],
+      }
     };
   });
 };
@@ -135,6 +135,7 @@ export const getInfo_servece = async (data: GetInfoUserDTO) => {
     relations: {
       profile: true,
       AccountToken: true,
+      projects: true,
     },
     select: {
       id: true,
@@ -158,6 +159,12 @@ export const getInfo_servece = async (data: GetInfoUserDTO) => {
         prefix: true,
         label: true,
       },
+      projects: {
+        id: true,
+        title: true,
+        description: true,
+        project_url: true,
+      },
     },
   });
 
@@ -165,7 +172,7 @@ export const getInfo_servece = async (data: GetInfoUserDTO) => {
 };
 
 // update profile
-export const updateProfile = async (
+export const updateProfile_service = async (
   userId: string,
   data: UpdateProfileDTO,
   files?: {
@@ -231,7 +238,7 @@ export const updateProfile = async (
 };
 
 // updata account
-export const updateAccount = async (userId: string, data: UpdateUserDTO) => {
+export const updateAccount_service = async (userId: string, data: UpdateUserDTO) => {
   const profile = await usersRepository.findOneBy({
     id: userId,
   });
@@ -244,3 +251,60 @@ export const updateAccount = async (userId: string, data: UpdateUserDTO) => {
 
   return await usersRepository.save(profile);
 };
+
+// create project
+export const createProject_service = async (userId: string, data: CreateProjectDTO) => {
+  const user = await usersRepository.findOneBy({ id: userId });
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+
+  // Assuming you have a Project entity and repository set up
+  const project = projectRepository.create({
+    ...data,
+    user: user,
+  });
+
+  await projectRepository.save(project);
+
+  const responce_custom={
+    id: project.id,
+    title: project.title,
+    description: project.description,
+    project_url: project.project_url
+  }
+
+  return responce_custom;
+}
+
+// update project
+export const updateProject_service = async (projectId: number, data: UpdateProjectDTO) => {
+  if(typeof projectId !== "number"){
+    throw new AppError("Invalid projectId", 400);
+  }
+  const project = await projectRepository.findOneBy({ id: projectId });
+
+  if (!project) {
+    throw new AppError("Project not found", 404);
+  }
+
+  Object.assign(project, data);
+
+  return await projectRepository.save(project);
+};
+
+// delete project
+export const deleteProject_service = async (projectId: number) => {
+  if(typeof projectId !== "number"){
+    throw new AppError("Invalid projectId", 400);
+  }
+  const project = await projectRepository.findOneBy({ id: projectId });
+
+  if (!project) {
+    throw new AppError("Project not found", 404);
+  }
+
+  await projectRepository.remove(project);
+
+  return { message: "Project deleted successfully" };
+}

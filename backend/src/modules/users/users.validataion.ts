@@ -38,3 +38,16 @@ export const UpdateAccountSchema = z.object({
         message: "At least one field must be provided",
     }
 );
+
+
+export const CreateProjectSchema = z.object({
+    title: z.string().min(3).max(100),
+    description: z.string().max(300),
+    project_url: z.string().url(),
+});
+
+export const UpdateProjectSchema = z.object({
+    title: z.string().min(3).max(100).optional(),
+    description: z.string().max(300).optional(),
+    project_url: z.string().url().optional(),
+});

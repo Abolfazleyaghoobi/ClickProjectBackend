@@ -1,8 +1,9 @@
 import { Router } from "express";
-import {  getInfoUser_controller, getInfoUserByUsername_controller, login_controller, register_controller, updateAccount_controller, updateProfile_controller } from "./users.controller";
+import {  createProject_controller, deleteProject_controller, getInfoUser_controller, getInfoUserByUsername_controller, login_controller, register_controller, updateAccount_controller, updateProfile_controller, updateProject_controller } from "./users.controller";
 import { authenticate } from "../../shared/middlewares/auth.middleware";
 import { imageUpload } from "../media/media.upload";
 import { validateImageContent } from "../media/media.validation";
+
 
 
 export const usersAuthRouter = Router();
@@ -30,4 +31,11 @@ usersProfileRouter.patch("/update",authenticate,imageUpload.fields([
 // update account
 usersProfileRouter.patch("/updateAccount",authenticate,updateAccount_controller)
 
-    
+// create project
+usersProfileRouter.post("/project",authenticate,createProject_controller)
+
+// update project
+usersProfileRouter.patch("/project/:id",authenticate,updateProject_controller)
+
+// remove project
+usersProfileRouter.delete("/project/:id",authenticate,deleteProject_controller)

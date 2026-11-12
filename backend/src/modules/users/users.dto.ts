@@ -33,3 +33,25 @@ export interface GetInfoUserDTO {
     id?: string;
     username?: string| string[];
 }
+
+
+// create project
+export interface CreateProjectDTO {
+    title: string;
+    description: string | null;
+    project_url: string | null;
+}
+
+// update project
+
+export interface UpdateProjectDTO {
+    title?: string;
+    description?: string | null;
+    project_url?: string | null;
+}
+
+
+
+
+
+
