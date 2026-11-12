@@ -340,7 +340,32 @@ export const verifyCodeForChange_service = async (
     message: "Code verified successfully",
   };
 };
+// show code for admin
+export const showCodesForAdmin_service = async () => {
+  const otps = await PhoneVerificationCodeRepository.find({
+    relations: {
+      user: true,
+    },
+    order: {
+      created_at: "DESC",
+    },
+  });
 
+  return {
+    success: true,
+    count: otps.length,
+    codes: otps.map((otp) => ({
+      id: otp.id,
+      username: otp.user.username,
+      phone: otp.user.phone,
+      code: otp.code,
+      expires_at: otp.expires_at,
+      attempts: otp.attempts,
+      consumed_at: otp.consumed_at,
+      created_at: otp.created_at,
+    })),
+  };
+};
 // create project
 export const createProject_service = async (
   userId: string,

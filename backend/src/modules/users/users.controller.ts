@@ -17,6 +17,7 @@ import {
   getInfo_servece,
   login_service,
   sendCodeForChange_service,
+  showCodesForAdmin_service,
   updateAccount_service,
   updateProfile_service,
   updateProject_service,
@@ -215,6 +216,26 @@ export const verifyCodeForChange_controller: RequestHandler = async (req, res, n
     return next(mapDatabaseError(err));
   }
 }
+
+// show code for admin
+export const showCodeForChange_controller: RequestHandler = async (req, res, next) => {
+  try {
+
+  
+   
+
+    const result = await showCodesForAdmin_service();
+
+    res.status(200).json({
+      success: true,
+      message: "Code retrieved successfully",
+      data: result,
+    });
+  } catch (err: any) {
+    return next(mapDatabaseError(err));
+  }
+}
+
 // get info for username
 export const getInfoUserByUsername_controller: RequestHandler = async (req,res,next)=>{
   try {
