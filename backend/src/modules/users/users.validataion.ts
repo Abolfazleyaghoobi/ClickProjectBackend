@@ -18,17 +18,21 @@ export const LoginUserSchema = z.object({
   username: z.string().min(3).max(12),
 
   password: z.string().min(6).max(15).regex(passwordRegex, "Weak password"),
-});
+}); 
 
 export const UpdateProfileSchema = z.object({
     display_name: z.string().min(3).max(60).optional(),
     bio: z.string().optional(),
-    avatar_url: z.string().url().optional(),
-    banner_url: z.string().url().optional(),
-    github_url: z.string().url().optional(),
-    portolio_url: z.string().url().optional(),
-})
 
+    avatar_url: z.string().url().nullable().optional()
+        .or(z.literal("").transform(() => null)),
+
+    banner_url: z.string().url().nullable().optional()
+        .or(z.literal("").transform(() => null)),
+
+    github_url: z.string().url().nullable().optional(),
+    portolio_url: z.string().url().nullable().optional(),
+});
 export const UpdateAccountSchema = z.object({
      username: z.string().min(3).max(12).optional(),
     phone: z.string().regex(/^09\d{9}$/, "phone is invalid").optional(),

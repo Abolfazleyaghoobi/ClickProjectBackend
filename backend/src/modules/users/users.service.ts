@@ -185,6 +185,8 @@ export const updateProfile_service = async (
     banner_url?: Express.Multer.File[];
   },
 ) => {
+  console.log("data", data);
+
   const profile = await profileRepository.findOne({
     where: { user_id: userId },
   });
@@ -192,47 +194,87 @@ export const updateProfile_service = async (
   if (!profile) {
     throw new AppError("Profile not found", 404);
   }
+
   const updateData: Partial<typeof profile> = {};
-  if (data.bio) {
+
+  // Bio
+  if (data.bio !== undefined) {
     updateData.bio = data.bio;
   }
-  if (data.display_name) {
+
+  // Display name
+  if (data.display_name !== undefined) {
     updateData.display_name = data.display_name;
   }
 
-  if (files?.avatar_url?.[0]) {
-    updateData.avatar_url = `/uploads/${files.avatar_url[0].filename}`;
+  // Avatar
+  const avatarFile = files?.avatar_url?.[0];
+
+  if (avatarFile) {
+    updateData.avatar_url = `/uploads/${avatarFile.filename}`;
+  } else if (data.avatar_url === null) {
+    updateData.avatar_url = null;
   }
 
-  if (files?.banner_url?.[0]) {
-    updateData.banner_url = `/uploads/${files.banner_url[0].filename}`;
+  // Banner
+  const bannerFile = files?.banner_url?.[0];
+
+  if (bannerFile) {
+    updateData.banner_url = `/uploads/${bannerFile.filename}`;
+  } else if (data.banner_url === null) {
+    updateData.banner_url = null;
   }
-  if (data.github_url) {
+
+  // GitHub URL
+  if (data.github_url !== undefined) {
     updateData.github_url = data.github_url;
   }
-  if (data.portolio_url) {
+
+  // Portfolio URL
+  if (data.portolio_url !== undefined) {
     updateData.portolio_url = data.portolio_url;
   }
-  if (!Object.keys(updateData).length) {
-    throw new AppError("no data for update", 400);
-  }
-  await profileRepository.update({ user_id: userId }, updateData);
 
+  // Check empty update
+  if (!Object.keys(updateData).length) {
+    throw new AppError("No data for update", 400);
+  }
+
+  // Update database
+  await profileRepository.update(
+    { user_id: userId },
+    updateData,
+  );
+
+  // Delete old images
   const filesToDelete: string[] = [];
 
-  if (files!.avatar_url && profile.avatar_url) {
+  if (
+    (avatarFile || data.avatar_url === null) &&
+    profile.avatar_url
+  ) {
     filesToDelete.push(profile.avatar_url);
   }
 
-  if (files!.banner_url && profile.banner_url) {
+  if (
+    (bannerFile || data.banner_url === null) &&
+    profile.banner_url
+  ) {
     filesToDelete.push(profile.banner_url);
   }
 
+  // Remove old files from server
   for (const file of filesToDelete) {
     const filename = path.basename(file);
-    const filePath = path.resolve(process.cwd(), "backend/upload", filename);
+
+    const filePath = path.resolve(
+      process.cwd(),
+      "backend/upload",
+      filename,
+    );
+
     await unlink(filePath).catch(() => {
-      // در صورت نبود فایل، آپدیت دیتابیس همچنان موفق است.
+      // Ignore if old file does not exist
     });
   }
 

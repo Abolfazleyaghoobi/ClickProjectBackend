@@ -3,7 +3,6 @@ import type { Request, Response, NextFunction } from "express";
 import { readFile, unlink } from "node:fs/promises";
 import { AppError } from "../../shared/errors/app.error";
 
-
 const isValidImage = (buffer: Buffer): boolean => {
   // WebP
   if (
@@ -23,16 +22,30 @@ export const validateImageContent = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    if (!req.file) {
+    const files = req.files as
+      | { [fieldname: string]: Express.Multer.File[] }
+      | undefined;
+
+    if (!files) {
+      
+      
       next();
+
       return;
     }
 
-    const buffer = await readFile(req.file.path);
+    const allFiles = [
+      ...(files.avatar_url ?? []),
+      ...(files.banner_url ?? []),
+    ];
 
-    if (!isValidImage(buffer)) {
-      await unlink(req.file.path);
-      throw new AppError("Invalid image format", 400);
+    for (const file of allFiles) {
+      const buffer = await readFile(file.path);
+
+      if (!isValidImage(buffer)) {
+        await unlink(file.path);
+        throw new AppError("Invalid image format", 400);
+      }
     }
 
     next();

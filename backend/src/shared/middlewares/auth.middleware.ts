@@ -4,6 +4,7 @@ import { env } from "../../configs/env";
 import { AppError } from "../errors/app.error";
 
 export const authenticate: RequestHandler = (req, res, next) => {
+
   try {
     const token = req.cookies.access_token;
     if (!token) {

@@ -259,8 +259,8 @@ export const updateProfile_controller: RequestHandler = async (
   next,
 ) => {
   try {
-    if (req.is("multipart/form-data")) {
     
+      console.log(req.body);
       
       const token = req.cookies.access_token;
       const decoded = decodeToken(token);
@@ -268,13 +268,13 @@ export const updateProfile_controller: RequestHandler = async (
         [fieldname: string]: Express.Multer.File[];
       };
 
-      if (!files) {
-        res.status(400).json({
-          success: false,
-          message: "لطفاً یک تصویر ارسال کنید",
-        });
-        return;
-      }
+      // if (!files) {
+      //   res.status(400).json({
+      //     success: false,
+      //     message: "لطفاً یک تصویر ارسال کنید",
+      //   });
+      //   return;
+      // }
       if (!decoded || typeof decoded === "string") {
         throw new AppError("Invalid token", 401);
       }
@@ -288,7 +288,7 @@ export const updateProfile_controller: RequestHandler = async (
         message: "Profile updated successfully",
         data: result,
       });
-    } 
+    
   } catch (err: any) {
     if (err instanceof ZodError) {
       const zodERR = err.issues.map((issue: any) => ({

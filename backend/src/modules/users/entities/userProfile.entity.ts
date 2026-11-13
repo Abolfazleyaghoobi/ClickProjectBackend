@@ -67,7 +67,6 @@ export class UserProfile {
 
   @Column({
     type: "text",
-
     nullable: true,
   })
   avatar_url!: string | null;
