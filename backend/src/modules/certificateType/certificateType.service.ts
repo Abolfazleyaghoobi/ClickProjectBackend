@@ -75,3 +75,10 @@ export const deleteCertificateType_service = async (
    await certificateTypeRepository.remove(certificateType);
   return certificateType;
 };
+
+
+// get all certificate type service
+export const getAllCertificateType_service = async () => {
+  const certificateTypes = await certificateTypeRepository.find();
+  return certificateTypes;
+};

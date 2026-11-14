@@ -1,9 +1,10 @@
 import { RequestHandler } from "express";
 import { decodeToken } from "../../shared/utils/decode";
 import { createCertificateTypeSchema, updateCertificateTypeSchema } from "./certificateType.validation";
-import { createCertificateType_service, deleteCertificateType_service, updateCertificateType_service } from "./certificateType.service";
+import { createCertificateType_service, deleteCertificateType_service, getAllCertificateType_service, updateCertificateType_service } from "./certificateType.service";
 import { AppError } from "../../shared/errors/app.error";
 import { mapDatabaseError } from "../../shared/middlewares/mapDatabaseError";
+
 
 
 export const createCertificateType_controller: RequestHandler = async (req, res,next) => {
@@ -43,6 +44,15 @@ export const deleteCertificateType_controller: RequestHandler = async (req, res,
         const data=updateCertificateTypeSchema.parse(req.body)
         const result= await deleteCertificateType_service(data,decode.id,id_crtt)
         res.status(200).json({message:"Certificate Type delete Successfully",result})
+    } catch (error:any) {
+        return next(mapDatabaseError(error))
+    }
+}
+
+export const getAllCertificateType_controller: RequestHandler = async (req, res,next) => {
+    try {
+        const result= await getAllCertificateType_service();
+        res.status(200).json({message:"All Certificate Type",result})
     } catch (error:any) {
         return next(mapDatabaseError(error))
     }
