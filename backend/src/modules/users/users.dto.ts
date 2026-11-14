@@ -48,7 +48,13 @@ export interface UpdateProjectDTO {
     project_url?: string | null;
 }
 
+export interface AssignCRTDTO{
+    userId:string;
+    certificateTypeId:string;
 
+  
+
+}
 
 
 

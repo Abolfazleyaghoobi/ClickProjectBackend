@@ -11,7 +11,6 @@ import {
 import { OneToOne } from "typeorm";
 import { UserProfile } from "./userProfile.entity";
 import { UserToken } from "./accountToken.entity";
-import { UserAchievement } from "./UserAchievement.entity";
 import { Project } from "./userProject.entity";
 import { PhoneVerificationCode } from "./PhoneVerificationCode.entity";
 
@@ -93,8 +92,7 @@ export class User {
   @OneToOne(() => UserToken, (profile: UserToken) => profile.user)
   AccountToken!: UserToken;
 
-  @OneToMany(() => UserAchievement, (profile: UserAchievement) => profile.user)
-  Achivement!: UserAchievement[];
+
 
   @OneToMany(() => Project, (project: Project) => project.user)
   projects!: Project[];

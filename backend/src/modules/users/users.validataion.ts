@@ -55,3 +55,11 @@ export const UpdateProjectSchema = z.object({
     description: z.string().max(300).optional(),
     project_url: z.string().url().optional(),
 });
+
+
+export const AssignCRTSchema = z.object({
+    userId:z.string(),
+    certificateTypeId:z.string(),
+  
+   
+})

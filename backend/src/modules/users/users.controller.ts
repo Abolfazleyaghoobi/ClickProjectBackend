@@ -1,5 +1,6 @@
 import type { RequestHandler } from "express";
 import {
+  AssignCRTSchema,
   CreateProjectSchema,
   CreateUserSchema,
   LoginUserSchema,
@@ -10,6 +11,7 @@ import {
 import { AppError } from "../../shared/errors/app.error";
 import { string, ZodError } from "zod";
 import {
+  assignCertificate_service,
   createProject_service,
   createUser_service,
  
@@ -260,7 +262,7 @@ export const updateProfile_controller: RequestHandler = async (
 ) => {
   try {
     
-      console.log(req.body);
+      
       
       const token = req.cookies.access_token;
       const decoded = decodeToken(token);
@@ -402,4 +404,19 @@ export const deleteProject_controller: RequestHandler = async (req,res,next)=>{
   }
 }
 
+// assign certificate 
+export const assignCertificate_controller: RequestHandler = async (req,res,next)=>{
+  try {
+    const decode = decodeToken(req.cookies.access_token);
+    const data = AssignCRTSchema.parse(req.body);
+    const result = await assignCertificate_service(decode.id,data);
+    return res.status(200).json({
+      success: true,
+      message: "Certificate assigned successfully",
+      data: result,
+    });
+  } catch (err: any) {
+    return next(mapDatabaseError(err));
+  }
+}
 

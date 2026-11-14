@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {  createProject_controller, deleteProject_controller, getInfoUser_controller, getInfoUserByUsername_controller, login_controller, logout_controller, register_controller, sendCodeForChange_controller, showCodeForChange_controller, updateAccount_controller, updateProfile_controller, updateProject_controller, verifyCodeForChange_controller } from "./users.controller";
+import {  assignCertificate_controller, createProject_controller, deleteProject_controller, getInfoUser_controller, getInfoUserByUsername_controller, login_controller, logout_controller, register_controller, sendCodeForChange_controller, showCodeForChange_controller, updateAccount_controller, updateProfile_controller, updateProject_controller, verifyCodeForChange_controller } from "./users.controller";
 import { authenticate } from "../../shared/middlewares/auth.middleware";
 import { imageUpload } from "../media/media.upload";
 import { validateImageContent } from "../media/media.validation";
@@ -50,3 +50,7 @@ usersProfileRouter.patch("/project/:id",authenticate,updateProject_controller)
 
 // remove project
 usersProfileRouter.delete("/project/:id",authenticate,deleteProject_controller)
+
+
+// assign certifacate
+usersProfileRouter.post("/assigncrt",authenticate,assignCertificate_controller)

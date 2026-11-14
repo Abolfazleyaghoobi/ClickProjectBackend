@@ -4,8 +4,9 @@ import { AppDataSource } from "../../databases/data-source";
 import { AppError } from "../../shared/errors/app.error";
 import { hashPassword, verifyPassword } from "../../shared/utils/hashPassword";
 import { UserProfile } from "./entities/userProfile.entity";
-import { User } from "./entities/users.entity";
+import { User, UserRole } from "./entities/users.entity";
 import {
+  AssignCRTDTO,
   CreateProjectDTO,
   GetInfoUserDTO,
   Login_interface,
@@ -19,12 +20,14 @@ import {
   PhoneVerificationCodeRepository,
   profileRepository,
   projectRepository,
+  userCertificateRepository,
   usersRepository,
 } from "./users.repository";
 import { UserToken } from "./entities/accountToken.entity";
 import { generateAccountToken } from "../../shared/utils/generateTokenAccount";
 import { generateOtp } from "../../shared/utils/generateOPT";
 import { IsNull, MoreThan } from "typeorm";
+import { certificateTypeRepository } from "../certificateType/certificateType.repository";
 
 // register User
 export const createUser_service = async (data: Register_interface) => {
@@ -241,25 +244,16 @@ export const updateProfile_service = async (
   }
 
   // Update database
-  await profileRepository.update(
-    { user_id: userId },
-    updateData,
-  );
+  await profileRepository.update({ user_id: userId }, updateData);
 
   // Delete old images
   const filesToDelete: string[] = [];
 
-  if (
-    (avatarFile || data.avatar_url === null) &&
-    profile.avatar_url
-  ) {
+  if ((avatarFile || data.avatar_url === null) && profile.avatar_url) {
     filesToDelete.push(profile.avatar_url);
   }
 
-  if (
-    (bannerFile || data.banner_url === null) &&
-    profile.banner_url
-  ) {
+  if ((bannerFile || data.banner_url === null) && profile.banner_url) {
     filesToDelete.push(profile.banner_url);
   }
 
@@ -267,11 +261,7 @@ export const updateProfile_service = async (
   for (const file of filesToDelete) {
     const filename = path.basename(file);
 
-    const filePath = path.resolve(
-      process.cwd(),
-      "backend/upload",
-      filename,
-    );
+    const filePath = path.resolve(process.cwd(), "backend/upload", filename);
 
     await unlink(filePath).catch(() => {
       // Ignore if old file does not exist
@@ -470,5 +460,61 @@ export const deleteProject_service = async (projectId: number) => {
   return { message: "Project deleted successfully" };
 };
 
+// assign certificate
 
+export const assignCertificate_service = async (
+  idAdmin: string,
+  data: AssignCRTDTO,
+) => {
+  // بررسی ادمین
+  const isAdmin = await usersRepository.findOne({
+    where: { id: idAdmin },
+  });
 
+  if (!isAdmin || isAdmin.role !== UserRole.ADMIN) {
+    throw new AppError("You are not admin", 403);
+  }
+
+  // بررسی وجود کاربر دریافت‌کننده گواهی
+  const isUser = await usersRepository.findOne({
+    where: { id: data.userId },
+  });
+
+  if (!isUser) {
+    throw new AppError("User not found", 404);
+  }
+
+  // بررسی نوع گواهی
+  const certificateType = await certificateTypeRepository.findOne({
+    where: { id: data.certificateTypeId },
+  });
+
+  if (!certificateType) {
+    throw new AppError("Certificate type not found", 404);
+  }
+
+  // بررسی تکراری نبودن
+  const existingCertificate = await userCertificateRepository.findOne({
+    where: {
+      userId: data.userId,
+      certificateTypeId: data.certificateTypeId,
+    },
+  });
+
+  if (existingCertificate) {
+    throw new AppError("User already has this certificate", 409);
+  }
+
+  // ثبت گواهی
+  const userCertificate = userCertificateRepository.create({
+    userId: String(data.userId),
+    certificateTypeId: String(data.certificateTypeId),
+    source: isAdmin.profile?.display_name ?? "admin",
+    awardedAt: new Date()
+
+  });
+
+  await userCertificateRepository.save(userCertificate);
+
+  return userCertificate;
+};
