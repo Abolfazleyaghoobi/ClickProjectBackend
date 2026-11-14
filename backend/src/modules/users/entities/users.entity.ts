@@ -11,8 +11,11 @@ import {
 import { OneToOne } from "typeorm";
 import { UserProfile } from "./userProfile.entity";
 import { UserToken } from "./accountToken.entity";
+import { UserCertificate } from "./userCertificate.entity";
 import { Project } from "./userProject.entity";
 import { PhoneVerificationCode } from "./PhoneVerificationCode.entity";
+import { AchievementDefinition } from "../../achievement/entity/achievement.entity";
+import { CertificateType } from "../../certificateType/entity/certificateType.entity";
 
 export enum UserRole {
   USER = "user",
@@ -78,10 +81,8 @@ export class User {
   @Column({ type: "int", unsigned: true, default: 1000 })
   xp_to_next_level!: number;
 
-   @Column({ type: "boolean", unsigned: true, default: false })
+  @Column({ type: "boolean", unsigned: true, default: false })
   changeNumber!: boolean;
-
-
 
   @Column({ type: "int", unsigned: true, default: 0 })
   step_balance!: number;
@@ -92,13 +93,15 @@ export class User {
   @OneToOne(() => UserToken, (profile: UserToken) => profile.user)
   AccountToken!: UserToken;
 
-
-
   @OneToMany(() => Project, (project: Project) => project.user)
   projects!: Project[];
+ @OneToMany(
+  () => UserCertificate,
+  (userCertificate) => userCertificate.user,
+)
+certificates!: UserCertificate[];
   @OneToMany(() => PhoneVerificationCode, (otp) => otp.user)
   phone_verification_codes!: PhoneVerificationCode[];
-
 
   @Column({
     type: "datetime",

@@ -135,47 +135,67 @@ export const getInfo_servece = async (data: GetInfoUserDTO) => {
     throw new AppError("Invalid username", 400);
   }
 
-  const user = await usersRepository.findOne({
-    where: {
-      ...(data.id && { id: data.id }),
-      ...(data.username && { username: data.username }),
-    },
-    relations: {
-      profile: true,
-      AccountToken: true,
-      projects: true,
-    },
-    select: {
-      id: true,
-      username: true,
-      phone: true,
-      status: true,
-      level: true,
-      xp: true,
-      xp_to_next_level: true,
-      step_balance: true,
-      profile: {
-        display_name: true,
-        bio: true,
-        avatar_url: true,
-        banner_url: true,
-        github_url: true,
-        portolio_url: true,
-      },
-      AccountToken: {
-        token_Raw: Boolean(data.id),
-        prefix: true,
-        label: true,
-      },
-      projects: {
-        id: true,
-        title: true,
-        description: true,
-        project_url: true,
-      },
-    },
-  });
+const user = await usersRepository.findOne({
+  where: {
+    ...((data.id) && { id: data.id }),
+    ...((data.username) && { username: data.username }),
+  },
 
+  relations: {
+    profile: true,
+    AccountToken: true,
+    projects: true,
+    certificates: {
+      certificateType: true,
+    },
+  },
+
+  select: {
+    id: true,
+    username: true,
+    phone: true,
+    status: true,
+    level: true,
+    xp: true,
+    xp_to_next_level: true,
+    step_balance: true,
+
+    profile: {
+      display_name: true,
+      bio: true,
+      avatar_url: true,
+      banner_url: true,
+      github_url: true,
+      portolio_url: true,
+    },
+
+    AccountToken: {
+      token_Raw: Boolean(data.id),
+      prefix: true,
+      label: true,
+    },
+
+    projects: {
+      id: true,
+      title: true,
+      description: true,
+      project_url: true,
+    },
+
+    certificates: {
+      userId: true,
+source:true,
+      certificateType: {
+        id: true,
+        key: true,
+        title: true,
+        iconKey: true,
+        color: true,
+        isActive: true,
+      },
+    },
+  },
+});
   return user;
 };
 
