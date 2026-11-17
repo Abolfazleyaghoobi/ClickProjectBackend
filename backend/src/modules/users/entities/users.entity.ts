@@ -14,8 +14,7 @@ import { UserToken } from "./accountToken.entity";
 import { UserCertificate } from "./userCertificate.entity";
 import { Project } from "./userProject.entity";
 import { PhoneVerificationCode } from "./PhoneVerificationCode.entity";
-import { AchievementDefinition } from "../../achievement/entity/achievement.entity";
-import { CertificateType } from "../../certificateType/entity/certificateType.entity";
+
 
 export enum UserRole {
   USER = "user",

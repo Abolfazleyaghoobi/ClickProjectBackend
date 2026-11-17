@@ -10,7 +10,12 @@ import {
 } from "typeorm";
 
 export enum AdminRole {
-  ADMIN = "admin",
+  MENTOR_MANAGER = "mentor_manager",
+  SENIOR_MENTOR = "senior_mentor",
+  FIRST_CLASS_MENTOR = "first_class_mentor",
+  SECOND_CLASS_MENTOR = "second_class_mentor",
+  THIRD_CLASS_MENTOR = "third_class_mentor",
+  TRAINEE_MENTOR = "trainee_mentor",
 }
 
 @Entity("admins")
@@ -39,11 +44,11 @@ export class Admins {
   email!: string;
 
   @Column({
-      type:"varchar",
-      length:5,
-      default:AdminRole.ADMIN
+      type:"enum",
+    enum: AdminRole,
+    default: AdminRole.TRAINEE_MENTOR
   })
-  role!:string;
+  role!:AdminRole;
 
   @CreateDateColumn({
     type: "datetime",
