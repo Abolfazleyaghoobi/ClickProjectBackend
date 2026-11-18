@@ -1,5 +1,5 @@
 import { AppError } from "../../shared/errors/app.error";
-import { UserRole } from "../users/entities/users.entity";
+import { AdminRole } from "../users/entities/users.entity";
 import { usersRepository } from "../users/users.repository";
 import {
   CreateCertificateTypeDto,
@@ -16,7 +16,7 @@ export const createCertificateType_service = async (
       id,
     },
   });
-  if (isAdmin!.role !== UserRole.ADMIN) {
+  if (isAdmin!.role !== AdminRole.MENTOR_MANAGER) {
     throw new AppError("You are not admin", 403);
   }
   //   CRTType => certificate type
@@ -36,7 +36,7 @@ export const updateCertificateType_service = async (
       id,
     },
   });
-  if (isAdmin!.role !== UserRole.ADMIN) {
+  if (isAdmin!.role !== AdminRole.MENTOR_MANAGER) {
     throw new AppError("You are not admin", 403);
   }
   const certificateType = await certificateTypeRepository.findOneBy({
@@ -62,7 +62,7 @@ export const deleteCertificateType_service = async (
       id,
     },
   });
-  if (isAdmin!.role !== UserRole.ADMIN) {
+  if (isAdmin!.role !== AdminRole.MENTOR_MANAGER) {
     throw new AppError("You are not admin", 403);
   }
   const certificateType = await certificateTypeRepository.findOneBy({

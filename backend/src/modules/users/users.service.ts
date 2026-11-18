@@ -4,7 +4,7 @@ import { AppDataSource } from "../../databases/data-source";
 import { AppError } from "../../shared/errors/app.error";
 import { hashPassword, verifyPassword } from "../../shared/utils/hashPassword";
 import { UserProfile } from "./entities/userProfile.entity";
-import { User, UserRole } from "./entities/users.entity";
+import { User, AdminRole } from "./entities/users.entity";
 import {
   AssignCRTDTO,
   CreateProjectDTO,
@@ -17,6 +17,7 @@ import {
 } from "./users.dto";
 
 import {
+  GetAllUsers_Repository,
   PhoneVerificationCodeRepository,
   profileRepository,
   projectRepository,
@@ -135,68 +136,7 @@ export const getInfo_servece = async (data: GetInfoUserDTO) => {
     throw new AppError("Invalid username", 400);
   }
 
-  const user = await usersRepository.findOne({
-    where: {
-      ...(data.id && { id: data.id }),
-      ...(data.username && { username: data.username }),
-    },
-
-    relations: {
-      profile: true,
-      AccountToken: true,
-      projects: true,
-      certificates: {
-        certificateType: true,
-      },
-    },
-
-    select: {
-      id: true,
-      username: true,
-      phone: true,
-      status: true,
-      level: true,
-      xp: true,
-      xp_to_next_level: true,
-      step_balance: true,
-
-      profile: {
-        display_name: true,
-        bio: true,
-        avatar_url: true,
-        banner_url: true,
-        github_url: true,
-        portolio_url: true,
-      },
-
-      AccountToken: {
-        token_Raw: Boolean(data.id),
-        prefix: true,
-        label: true,
-      },
-
-      projects: {
-        id: true,
-        title: true,
-        description: true,
-        project_url: true,
-      },
-
-      certificates: {
-        userId: true,
-        source: true,
-        certificateTypeId: true,
-        certificateType: {
-          id: true,
-          key: true,
-          title: true,
-          iconKey: true,
-          color: true,
-          isActive: true,
-        },
-      },
-    },
-  });
+  const user = await GetAllUsers_Repository(data);
 
   return user;
 };
@@ -493,7 +433,7 @@ export const assignCertificate_service = async (
     where: { id: idAdmin },
   });
 
-  if (!isAdmin || isAdmin.role !== UserRole.ADMIN) {
+  if (!isAdmin || isAdmin.role !== AdminRole.MENTOR_MANAGER) {
     throw new AppError("You are not admin", 403);
   }
 

@@ -16,11 +16,15 @@ import { Project } from "./userProject.entity";
 import { PhoneVerificationCode } from "./PhoneVerificationCode.entity";
 
 
-export enum UserRole {
-  USER = "user",
-  ADMIN = "admin",
+export enum AdminRole {
+  MENTOR_MANAGER = "mentor_manager",
+  SENIOR_MENTOR = "senior_mentor",
+  FIRST_CLASS_MENTOR = "first_class_mentor",
+  SECOND_CLASS_MENTOR = "second_class_mentor",
+  THIRD_CLASS_MENTOR = "third_class_mentor",
+  TRAINEE_MENTOR = "trainee_mentor",
+  USER="user"
 }
-
 export enum UserStatus {
   ACTIVE = "active",
   INACTIVE = "inactive",
@@ -59,10 +63,10 @@ export class User {
 
   @Column({
     type: "enum",
-    enum: UserRole,
-    default: UserRole.USER,
+    enum: AdminRole,
+    default: AdminRole.USER,
   })
-  role!: UserRole;
+  role!: AdminRole;
 
   @Column({
     type: "enum",

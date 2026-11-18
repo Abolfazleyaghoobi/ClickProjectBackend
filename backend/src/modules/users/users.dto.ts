@@ -30,6 +30,7 @@ export interface UpdateUserDTO {
 export interface GetInfoUserDTO {
     id?: string;
     username?: string| string[];
+   
 }
 
 

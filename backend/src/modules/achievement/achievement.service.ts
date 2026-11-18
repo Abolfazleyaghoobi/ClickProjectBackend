@@ -1,6 +1,6 @@
 
 import { AppError } from "../../shared/errors/app.error";
-import { UserRole } from "../users/entities/users.entity";
+import { AdminRole } from "../users/entities/users.entity";
 import { usersRepository } from "../users/users.repository";
 import { CreateAchievementDto, UpadateAchievementDto } from "./achievement.dto";
 import { achievementRepository } from "./achievement.repository";
@@ -14,7 +14,7 @@ export const createAchivement_service = async (
       id,
     },
   });
-  if (isAdmin?.role !== UserRole.ADMIN) {
+  if (isAdmin?.role !== AdminRole.MENTOR_MANAGER) {
     throw new AppError("You are not admin", 403);
   }
   const achivement = await achievementRepository.create(data);
@@ -35,7 +35,7 @@ export const updateAchivement_service = async (
       id,
     },
   });
-  if (isAdmin?.role !== UserRole.ADMIN) {
+  if (isAdmin?.role !== AdminRole.MENTOR_MANAGER) {
     throw new AppError("You are not admin", 403);
   }
   const achivement = await achievementRepository.findOneBy({
