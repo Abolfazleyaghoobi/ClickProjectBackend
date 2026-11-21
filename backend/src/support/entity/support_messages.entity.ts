@@ -5,12 +5,15 @@ import {
   CreateDateColumn,
   Index,
   ManyToOne,
-  JoinColumn
+  JoinColumn,
 } from "typeorm";
 import { SupportConversation } from "./support_conversations.entity";
 import { AdminRole } from "../../modules/admin/entity/admin.entity";
 
-
+export enum SenderType {
+  USER = "user",
+  SUPPORT = "support",
+}
 @Entity("support_messages")
 @Index("idx_messages_conversation_id", ["conversationId"])
 @Index("idx_messages_created_at", ["createdAt"])
@@ -25,9 +28,9 @@ export class SupportMessage {
   @Column({
     name: "sender_type",
     type: "enum",
-    enum:  AdminRole
+    enum: SenderType,
   })
-  senderType!:AdminRole; // نوع فرستنده مطابق مستند (user یا support)
+  senderType!: SenderType;
 
   @Column({ name: "sender_id", type: "bigint" })
   senderId!: string;
@@ -42,7 +45,7 @@ export class SupportMessage {
   @ManyToOne(
     () => SupportConversation,
     (conversation) => conversation.messages,
-    { onDelete: "CASCADE" }
+    { onDelete: "CASCADE" },
   )
   @JoinColumn({ name: "conversation_id" })
   conversation!: SupportConversation;

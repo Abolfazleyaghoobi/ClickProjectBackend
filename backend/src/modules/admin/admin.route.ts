@@ -5,7 +5,7 @@ export const adminRouter = Router();
 
 
 
-adminRouter.post("/login", loginAdmin_controller);
+adminRouter.post("/auth/login", loginAdmin_controller);
 
 
 

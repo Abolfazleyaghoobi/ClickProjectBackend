@@ -6,7 +6,6 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   Index,
-  OneToMany,
 } from "typeorm";
 
 export enum AdminRole {
@@ -38,11 +37,18 @@ export class Admins {
   
   @Column({
       type:"varchar",
-      length:60,
+      length:11,
       unique:true
   })
-  email!: string;
-
+  phone!: string;
+ 
+  @Column({
+      type:"varchar",
+      length:6,
+      unique:true
+  })
+  password!: string;
+ 
   @Column({
       type:"enum",
     enum: AdminRole,

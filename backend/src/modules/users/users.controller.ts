@@ -41,9 +41,10 @@ export const register_controller: RequestHandler = async (req, res, next) => {
     const result = await createUser_service(data);
 
     // Generate token
-    const token = generateToken({
-      id: result.id,
-    });
+  const token = generateToken({
+  id: result!.id,
+  type: "user",
+});
 
     // Send cookie
     res.cookie("access_token", token, {
@@ -82,10 +83,10 @@ export const login_controller: RequestHandler = async (req, res, next) => {
     const result = await login_service(data);
 
     // Generate token
-    const token = generateToken({
-      id: result!.id,
-    });
-
+   const token = generateToken({
+  id: result!.id,
+  type: "user",
+});
     // Send cookie
     res.cookie("access_token", token, {
       httpOnly: true,

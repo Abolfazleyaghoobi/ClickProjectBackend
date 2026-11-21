@@ -6,8 +6,8 @@ export const loginAdmin_service = async (data: LoginAdminDTO) => {
   try {
     const admin = await adminRepository.findOne({
       where: {
-        username: data.username,
-        email: data.email,
+        phone: data.phone,
+        password: data.password,
       },
       withDeleted: true,
     });
