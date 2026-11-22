@@ -20,7 +20,9 @@ export class Path_List {
   id!: number;
 
   // هر بخش متعلق به یک مسیر است
-  @ManyToOne(() => Path, (path) => path.Path_List)
+  @ManyToOne(() => Path, (path) => path.Path_List,  {
+    onDelete: "CASCADE",
+  },)
   @JoinColumn({ name: "pathId" })
   path!: Path;
 

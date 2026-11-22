@@ -42,3 +42,18 @@ export const pathCreate_service = async (data: PathCreateDTO,files?: {
   };
   return customResponse;
 };
+
+
+export const pathDelete_service = async (id: number) => {
+ const path = await pathRepository.findOneBy({ id });
+
+ 
+ if (!path) {
+   throw new AppError("path not found", 404);
+  
+}
+
+await pathRepository.remove(path);
+return "path deleted successfully"
+  }
+  

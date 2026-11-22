@@ -3,7 +3,7 @@ import { pathCreateSchema } from "./path.validation";
 import { AppError } from "../../shared/errors/app.error";
 import { mapDatabaseError } from "../../shared/middlewares/mapDatabaseError";
 import { ZodError } from "zod";
-import { pathCreate_service } from "./path.service";
+import { pathCreate_service, pathDelete_service } from "./path.service";
 
 export const createPath_controller: RequestHandler = async (req, res, next) => {
   try {
@@ -38,3 +38,23 @@ export const getAllPaths_controller: RequestHandler = async (req, res) => {
   // TODO: get all paths
   res.status(200).json({ message: "getAllPaths_controller" });
 };
+
+
+
+
+
+export const deletePath_controller: RequestHandler = async (req, res,next) => {
+  try {
+    const id = Number(req.params.id);
+  
+    const result = await pathDelete_service(id);
+    res.status(200).json({ message: result });
+  } catch (error:any) {
+  throw new AppError(error, 500);
+    
+  }
+};
+
+
+
+

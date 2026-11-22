@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createPath_controller } from "./path.controller";
+import { createPath_controller, deletePath_controller } from "./path.controller";
 import { imageUpload } from "../media/media.upload";
 
 export const pathRouter = Router();
@@ -10,4 +10,4 @@ pathRouter.post('/create',imageUpload.fields([
 ]), createPath_controller)
 
 
-
+pathRouter.delete('/delete/:id',deletePath_controller)
