@@ -4,6 +4,14 @@ export interface PathCreateDTO {
   key: string;
   title: string;
   description: string;
-image_url?: string | null;
+  image_url?: string | null;
   is_published: isPublished;
+}
+
+export interface PathUpdateDTO {
+  key?: string;
+  title?: string;
+  description?: string;
+  image_url?: string | null;
+  is_published?: isPublished;
 }
