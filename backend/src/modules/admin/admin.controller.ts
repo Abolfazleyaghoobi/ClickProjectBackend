@@ -21,7 +21,7 @@ export const loginAdmin_controller: RequestHandler = async (req, res, next) => {
       type: "support",
     });
     // Send cookie
-    res.cookie("access_token", token, {
+    res.cookie("admin_token", token, {
       httpOnly: true,
       secure: false, // فقط محیط توسعه
       sameSite: "lax",
