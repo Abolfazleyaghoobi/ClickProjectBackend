@@ -25,7 +25,7 @@ app.use(appConfig.apiPrefix,apiRoute)
 // upload files
 app.use(
   "/uploads",
-  express.static(path.resolve(process.cwd(), "backend/upload")),
+  express.static(path.resolve(process.cwd(), "backend/upload/")),
 );
 
 

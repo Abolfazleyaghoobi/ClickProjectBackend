@@ -66,13 +66,15 @@ export class UserProfile {
   portolio_url!: string | null;
 
   @Column({
-    type: "text",
+    type: "varchar",
+    length: 150,
     nullable: true,
   })
   avatar_url!: string | null;
 
   @Column({
-    type: "text",
+   type: "varchar",
+    length: 150,
 
     nullable: true,
   })

@@ -4,6 +4,7 @@ import { mediaRouter } from "../modules/media/media.route";
 import { achievementRouter } from "../modules/achievement/achievement.route";
 import { certificateTypeRouter } from "../modules/certificateType/certificateType.route";
 import { adminRouter } from "../modules/admin/admin.route";
+import { pathRouter } from "../modules/path/path.route";
 
 
 export const  apiRoute=Router();
@@ -28,5 +29,6 @@ apiRoute.use("/crttype",certificateTypeRouter)
 // rout admin 
 apiRoute.use("/admin",adminRouter)
 
-
+// route path
+apiRoute.use("/path",pathRouter)
 

@@ -150,7 +150,7 @@ export const updateProfile_service = async (
     banner_url?: Express.Multer.File[];
   },
 ) => {
-  console.log("data", data);
+ 
 
   const profile = await profileRepository.findOne({
     where: { user_id: userId },
