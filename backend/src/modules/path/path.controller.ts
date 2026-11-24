@@ -45,7 +45,7 @@ export const updatePath_controller: RequestHandler = async (req, res, next) => {
     const files = req.files as {
       [fieldname: string]: Express.Multer.File[];
     };
-    console.log('files', files)
+  
     const id = Number(req.params.id);
   
     const data = pathUpdateSchema.parse(req.body);

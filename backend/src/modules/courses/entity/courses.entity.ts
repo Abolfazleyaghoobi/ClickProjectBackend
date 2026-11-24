@@ -46,7 +46,7 @@ export class Course {
   })
   is_published!: isPublished;
 
-  // هر دوره می‌تواند در چندین بخش قرار بگیرد
+
   @OneToMany(
     () => PathList_course,
     (pathListCourse) => pathListCourse.course,

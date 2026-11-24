@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { usersAuthRouter, usersProfileRouter } from "../modules/users/users.routes";
+import { globalRouter, usersAuthRouter, usersProfileRouter } from "../modules/users/users.routes";
 import { mediaRouter } from "../modules/media/media.route";
 import { achievementRouter } from "../modules/achievement/achievement.route";
 import { certificateTypeRouter } from "../modules/certificateType/certificateType.route";
 import { adminRouter } from "../modules/admin/admin.route";
 import { pathRouter } from "../modules/path/path.route";
+import { coursesRouter } from "../modules/courses/courses.route";
 
 
 export const  apiRoute=Router();
@@ -31,4 +32,10 @@ apiRoute.use("/admin",adminRouter)
 
 // route path
 apiRoute.use("/path",pathRouter)
+
+// global route
+apiRoute.use("/global",globalRouter)
+
+apiRoute.use("/course",coursesRouter)
+
 

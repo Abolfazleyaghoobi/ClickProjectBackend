@@ -3,11 +3,14 @@ import {  assignCertificate_controller, createProject_controller, deleteProject_
 import { authenticate } from "../../shared/middlewares/auth.middleware";
 import { imageUpload } from "../media/media.upload";
 import { validateImageContent } from "../media/media.validation";
+import { getAllPaths_controller } from "../path/path.controller";
+import { getAllCourse_controller } from "../courses/courses.controller";
 
 
 
 export const usersAuthRouter = Router();
 export const usersProfileRouter = Router();
+export const globalRouter=Router();
 
 
 // register user
@@ -54,3 +57,9 @@ usersProfileRouter.delete("/project/:id",authenticate,deleteProject_controller)
 
 // assign certifacate
 usersProfileRouter.post("/assigncrt",authenticate,assignCertificate_controller)
+
+// get all paths for user
+globalRouter.get('/getpath_user',getAllPaths_controller)
+
+// get all course for user 
+globalRouter.get('/getpath_user',getAllCourse_controller)
