@@ -1,4 +1,3 @@
-
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -46,11 +45,9 @@ export class Course {
   })
   is_published!: isPublished;
 
-
-  @OneToMany(
-    () => PathList_course,
-    (pathListCourse) => pathListCourse.course,
-  )
+  @OneToMany(() => PathList_course, (pathListCourse) => pathListCourse.course, {
+    onDelete: "CASCADE",
+  })
   pathList_course!: PathList_course[];
 
   @CreateDateColumn({

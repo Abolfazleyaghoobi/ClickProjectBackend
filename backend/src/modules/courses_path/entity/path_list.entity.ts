@@ -9,6 +9,7 @@ import {
   ManyToOne,
   OneToMany,
   JoinColumn,
+  OneToOne,
 } from "typeorm";
 
 import { Path } from "../../path/entity/path.entity";
@@ -20,14 +21,16 @@ export class Path_List {
   id!: number;
 
   // هر بخش متعلق به یک مسیر است
-  @ManyToOne(() => Path, (path) => path.Path_List,  {
-    onDelete: "CASCADE",
-  },)
-  @JoinColumn({ name: "pathId" })
-  path!: Path;
+ @OneToOne(
+  () => Path,
+  (path) => path.Path_List,
+  { onDelete: "CASCADE" }
+)
+@JoinColumn({ name: "pathId" })
+path!: Path;
 
-  @Column({ type: "int" })
-  pathId!: number;
+@Column({ type: "int", unique: true })
+pathId!: number;
 
   // هر بخش می‌تواند چندین ارتباط با دوره‌ها داشته باشد
   @OneToMany(

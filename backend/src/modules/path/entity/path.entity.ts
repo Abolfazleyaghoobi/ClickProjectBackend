@@ -7,6 +7,7 @@ import {
   DeleteDateColumn,
   Index,
   OneToMany,
+  OneToOne,
 } from "typeorm";
 import {  Path_List } from "../../courses_path/entity/path_list.entity";
 export enum isPublished {
@@ -51,9 +52,11 @@ export class Path {
   
 
 
-   @OneToMany(()=> Path_List,(Path_List)=>Path_List.path)
-   Path_List!: Path_List[];
-
+@OneToOne(
+  () => Path_List,
+  (pathList) => pathList.path
+)
+Path_List!: Path_List;
   @CreateDateColumn({
     type: "datetime",
     name: "created_at",

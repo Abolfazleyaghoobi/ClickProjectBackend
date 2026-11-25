@@ -21,12 +21,15 @@ export class PathList_course {
   id!: number;
 
   // ارتباط با بخش مسیر آموزشی
-  @ManyToOne(
-    () => Path_List,
-    (pathList) => pathList.courses,
-  )
-  @JoinColumn({ name: "path_list_id" })
-  pathList!: Path_List;
+ @ManyToOne(
+  () => Path_List,
+  pathList => pathList.courses,
+  {
+    onDelete: "CASCADE",
+  }
+)
+@JoinColumn({ name: "path_list_id" })
+pathList!: Path_List;
 
   @Column({ type: "int" })
   path_list_id!: number;
@@ -42,6 +45,9 @@ export class PathList_course {
   @Column({ type: "int" })
   coursesId!: number;
 
+  @Column({ type: "int" })
+  number_course_tutorial!: number;
+  
   @CreateDateColumn({
     type: "datetime",
     name: "created_at",
