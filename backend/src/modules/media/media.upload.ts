@@ -28,8 +28,7 @@ export const imageUpload = multer({
     },
   }),
   limits: {
-    fileSize: 1 * 1024 * 1024,
-    files: 2,
+    fileSize: 1 * 1024 * 1024
   },
   fileFilter: (_req, file, callback) => {
     if (!allowedMimeTypes.has(file.mimetype)) {

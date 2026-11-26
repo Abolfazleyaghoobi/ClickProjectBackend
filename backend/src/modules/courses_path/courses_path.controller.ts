@@ -80,7 +80,7 @@ export const changeCoursePath_controller:RequestHandler=async (req,res,next)=>{
     try {
         // const data = addCoursePathSchema.parse(req.body);
      const data=changeCoursePathSchema.parse(req.body);
-        const result= await changeCoursePath_service(data);
+         await changeCoursePath_service(data);
         res.status(200).json({message:"successfully"});
     } catch (err:any) {
         if (err instanceof ZodError) {

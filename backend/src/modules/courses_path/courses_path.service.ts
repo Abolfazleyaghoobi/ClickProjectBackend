@@ -16,9 +16,9 @@ export const getAllCoursPath_service = async (id: number) => {
     relations: {
       course: true,
     },
-    order:{
-        number_course_tutorial:"ASC"
-    }
+    order: {
+      number_course_tutorial: "ASC",
+    },
   });
   if (!data) {
     throw new AppError("Not data", 409);
@@ -53,6 +53,7 @@ export const addCourseToPath_service = async (data: addCourseToPathDto) => {
   }
   const isExistCourseToPathDuplicate = await pathList_courseRepository.existsBy(
     {
+      path_list_id: +data.pathListId,
       number_course_tutorial: +data.number_course_tutorial,
     },
   );
@@ -102,25 +103,23 @@ export const deleteCoursesPath_service = async (id: string) => {
   return "deleteCourseToPath successfully";
 };
 
+export const changeCoursePath_service = async (data: changeCoursePathDto) => {
+  return await AppDataSource.transaction(async (manager) => {
+    const repository = manager.getRepository(PathList_course);
 
-export const changeCoursePath_service = async (data:changeCoursePathDto)=>{
-  return  await AppDataSource.transaction(async (manager) => {
-  const repository = manager.getRepository(PathList_course);
+    const firstCourse = await repository.findOneBy({ id: +data.fristID });
+    const secondCourse = await repository.findOneBy({ id: +data.secondID });
 
-  const firstCourse = await repository.findOneBy({ id: +data.fristID });
-  const secondCourse = await repository.findOneBy({ id: +data.secondID });
+    if (!firstCourse || !secondCourse) {
+      throw new AppError("Course not found", 404);
+    }
 
-  if (!firstCourse || !secondCourse) {
-    throw new AppError("Course not found",404);
-  }
+    const temp = firstCourse.number_course_tutorial;
 
-  const temp = firstCourse.number_course_tutorial;
+    firstCourse.number_course_tutorial = secondCourse.number_course_tutorial;
 
-  firstCourse.number_course_tutorial =
-    secondCourse.number_course_tutorial;
+    secondCourse.number_course_tutorial = temp;
 
-  secondCourse.number_course_tutorial = temp;
-
-  await repository.save([firstCourse, secondCourse]);
-});
-}
+    await repository.save([firstCourse, secondCourse]);
+  });
+};

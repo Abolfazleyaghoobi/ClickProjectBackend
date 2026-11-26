@@ -6,9 +6,11 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   OneToMany,
+  ManyToOne,
 } from "typeorm";
 
 import { PathList_course } from "../../courses_path/entity/pathList_course.entity";
+import { steps } from "./step.entity";
 
 enum isPublished {
   yes = "yes",
@@ -19,6 +21,7 @@ enum isPublished {
 export class Course {
   @PrimaryGeneratedColumn()
   id!: number;
+  // main column
 
   @Column({
     type: "varchar",
@@ -50,6 +53,15 @@ export class Course {
   })
   pathList_course!: PathList_course[];
 
+
+
+// Course
+@OneToMany(() => steps, (step) => step.course)
+steps!: steps[];
+
+
+
+  // main column
   @CreateDateColumn({
     type: "datetime",
     name: "created_at",
