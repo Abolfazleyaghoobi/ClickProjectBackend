@@ -1,17 +1,19 @@
+
 import { AppDataSource } from "../../databases/data-source";
 import { AppError } from "../../shared/errors/app.error";
 import { coursesRepository } from "../courses/courses.repository";
 import { pathRepository } from "../path/path.repository";
-import { addCourseToPathDto, changeCoursePathDto } from "./courses_path.dto";
 import {
-  pathList_courseRepository
-} from "./courses_path.repository";
+  addCourseToPathDto,
+  changeCoursePathDto,
+} from "./courses_path.dto";
+import { pathList_courseRepository } from "./courses_path.repository";
 import { PathList_course } from "./entity/pathList_course.entity";
 
 export const getAllCoursPath_service = async (id: number) => {
   const data = await pathList_courseRepository.find({
     where: {
-      path_list_id: Number(id),
+      path_id: Number(id),
     },
     relations: {
       course: true,
@@ -20,52 +22,60 @@ export const getAllCoursPath_service = async (id: number) => {
       number_course_tutorial: "ASC",
     },
   });
-  if (!data) {
+
+  if (data.length === 0) {
     throw new AppError("Not data", 409);
   }
-  const customResponse = data.map((item) => {
-    return {
-      id: item.id,
-      numberSort: item.number_course_tutorial,
-      course: item.course,
-    };
-  });
+
+  const customResponse = data.map((item) => ({
+    id: item.id,
+    numberSort: item.number_course_tutorial,
+    course: item.course,
+  }));
 
   return customResponse;
 };
 
-export const addCourseToPath_service = async (data: addCourseToPathDto) => {
-  console.log({
-    courseId: data.courseId,
-    pathId: data.pathId,
-  });
+export const addCourseToPath_service = async (
+  data: addCourseToPathDto,
+) => {
   const isExistPath = await pathRepository.existsBy({
     id: +data.pathId,
   });
+
   if (!isExistPath) {
     throw new AppError("path not found", 404);
   }
+
   const isExistCourse = await coursesRepository.existsBy({
     id: +data.courseId,
   });
+
   if (!isExistCourse) {
     throw new AppError("course not found", 404);
   }
-  const isExistCourseToPathDuplicate = await pathList_courseRepository.existsBy(
-    {
-      path_list_id: +data.pathId,
+
+  const isExistCourseToPathDuplicate =
+    await pathList_courseRepository.existsBy({
+      path_id: +data.pathId,
       number_course_tutorial: +data.number_course_tutorial,
-    },
-  );
+    });
+
   if (isExistCourseToPathDuplicate) {
-    throw new AppError("number_course_tutorial already exist in path", 409);
+    throw new AppError(
+      "number_course_tutorial already exist in path",
+      409,
+    );
   }
-  const addCourseToPath = await pathList_courseRepository.create({
+
+  const addCourseToPath = pathList_courseRepository.create({
     coursesId: +data.courseId,
-    path_list_id: +data.pathId,
+    path_id: +data.pathId,
     number_course_tutorial: +data.number_course_tutorial,
   });
+
   await pathList_courseRepository.save(addCourseToPath);
+
   return "addCourseToPath successfully";
 };
 
@@ -81,18 +91,16 @@ export const deleteCoursesPath_service = async (id: string) => {
       throw new AppError("Course not found", 404);
     }
 
-    // حذف دوره
     await repository.remove(course);
 
-    // کاهش ترتیب دوره‌های بعد از دوره حذف‌شده
     await repository
       .createQueryBuilder()
       .update(PathList_course)
       .set({
         number_course_tutorial: () => "`number_course_tutorial` - 1",
       })
-      .where("path_list_id = :pathListId", {
-        pathListId: course.path_list_id,
+      .where("path_id = :pathId", {
+        pathId: course.path_id,
       })
       .andWhere("number_course_tutorial > :numberSort", {
         numberSort: course.number_course_tutorial,
@@ -103,20 +111,33 @@ export const deleteCoursesPath_service = async (id: string) => {
   return "deleteCourseToPath successfully";
 };
 
-export const changeCoursePath_service = async (data: changeCoursePathDto) => {
+export const changeCoursePath_service = async (
+  data: changeCoursePathDto,
+) => {
   return await AppDataSource.transaction(async (manager) => {
     const repository = manager.getRepository(PathList_course);
 
-    const firstCourse = await repository.findOneBy({ id: +data.fristID });
-    const secondCourse = await repository.findOneBy({ id: +data.secondID });
+    const firstCourse = await repository.findOneBy({
+      id: +data.fristID,
+    });
+
+    const secondCourse = await repository.findOneBy({
+      id: +data.secondID,
+    });
 
     if (!firstCourse || !secondCourse) {
       throw new AppError("Course not found", 404);
     }
 
+    // جلوگیری از جابه‌جایی دوره‌های متعلق به مسیرهای متفاوت
+    if (firstCourse.path_id !== secondCourse.path_id) {
+      throw new AppError("Courses belong to different paths", 409);
+    }
+
     const temp = firstCourse.number_course_tutorial;
 
-    firstCourse.number_course_tutorial = secondCourse.number_course_tutorial;
+    firstCourse.number_course_tutorial =
+      secondCourse.number_course_tutorial;
 
     secondCourse.number_course_tutorial = temp;
 
