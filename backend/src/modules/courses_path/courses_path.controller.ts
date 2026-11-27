@@ -31,12 +31,12 @@ export const getCoursePath_controller:RequestHandler=async (req,res,next)=>{
     try {
         // const data = addCoursePathSchema.parse(req.body);
     
-const {pathListId}= getCoursePathSchema.parse(req.body)
-        if (typeof pathListId !== "number") {
+const {pathId}= getCoursePathSchema.parse(req.body)
+        if (typeof pathId !== "number") {
             return  new AppError("Invalid pathListId", 400);
         }
 
-        const result= await getAllCoursPath_service(pathListId);
+        const result= await getAllCoursPath_service(pathId);
         res.status(200).json(result);
     } catch (err) {
         console.log('err', err)

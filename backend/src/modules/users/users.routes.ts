@@ -4,7 +4,8 @@ import { authenticate } from "../../shared/middlewares/auth.middleware";
 import { imageUpload } from "../media/media.upload";
 import { validateImageContent } from "../media/media.validation";
 import { getAllPaths_controller } from "../path/path.controller";
-import { getAllCourse_controller } from "../courses/courses.controller";
+import { getAllCourse_controller, getCourseById_controller } from "../courses/courses.controller";
+import { getCoursePath_controller } from "../courses_path/courses_path.controller";
 
 
 
@@ -60,6 +61,9 @@ usersProfileRouter.post("/assigncrt",authenticate,assignCertificate_controller)
 
 // get all paths for user
 globalRouter.get('/getpath_user',getAllPaths_controller)
+// get path with id for user
+globalRouter.post("/get_course_path_user", getCoursePath_controller)
 
+globalRouter.get("/getcourse_user_i/:id",getCourseById_controller);
 // get all course for user 
-globalRouter.get('/getpath_user',getAllCourse_controller)
+globalRouter.get('/getcourse_user',getAllCourse_controller)

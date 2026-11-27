@@ -1,5 +1,5 @@
 import { AppError } from "../../shared/errors/app.error";
-import { pathListRepository } from "../courses_path/courses_path.repository";
+// import { pathListRepository } from "../courses_path/courses_path.repository";
 import path from "node:path";
 import { Path } from "./entity/path.entity";
 import { PathCreateDTO, PathUpdateDTO } from "./path.dto";
@@ -7,16 +7,9 @@ import { pathRepository } from "./path.repository";
 import { unlink } from "node:fs/promises";
 // get all path
 export const getAllPath_service = async () => {
-  const paths = await pathRepository.find({
-    relations:{
-      Path_List:true
-    }
-  });
+  const paths = await pathRepository.find({});
   return paths;
-}
-
-
-
+};
 
 // create Path
 export const pathCreate_service = async (
@@ -45,12 +38,6 @@ export const pathCreate_service = async (
   });
   await pathRepository.save(path);
 
-  const pathList = await pathListRepository.create({
-    pathId: path.id,
-  });
-
-  await pathListRepository.save(pathList);
-
   const customResponse = {
     id: path.id,
     key: path.key,
@@ -58,7 +45,6 @@ export const pathCreate_service = async (
     description: path.description,
     image_url: path.image_ulr,
     is_published: path.is_published,
-    pathList:pathList.id
   };
   return customResponse;
 };

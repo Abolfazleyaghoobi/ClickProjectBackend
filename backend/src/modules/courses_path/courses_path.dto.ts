@@ -1,6 +1,6 @@
 export interface addCourseToPathDto {
   courseId: number;
-  pathListId: number;
+  pathId: number;
   number_course_tutorial: number;
 }
 

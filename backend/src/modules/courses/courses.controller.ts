@@ -267,6 +267,7 @@ export const getCourseById_controller: RequestHandler = async (
 ) => {
   try {
     const id = Number(req.params.id);
+    console.log('id', id)
 
     if (!Number.isInteger(id) || id <= 0) {
       throw new AppError("Invalid course ID", 400);

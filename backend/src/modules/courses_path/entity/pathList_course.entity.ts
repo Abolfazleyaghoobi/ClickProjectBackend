@@ -11,29 +11,29 @@ import {
   Index,
 } from "typeorm";
 
-import { Path_List } from "./path_list.entity";
+// import { Path_List } from "./path_list.entity";
 import { Course } from "../../courses/entity/courses.entity";
+import { Path } from "../../path/entity/path.entity";
 
 @Entity("PathList_course")
-@Index(["path_list_id", "coursesId"], { unique: true })
+@Index(["path_id", "coursesId"], { unique: true })
 export class PathList_course {
   @PrimaryGeneratedColumn()
   id!: number;
 
   // ارتباط با بخش مسیر آموزشی
- @ManyToOne(
-  () => Path_List,
-  pathList => pathList.courses,
+@ManyToOne(
+  () => Path,
+  (path) => path.pathList_course,
   {
     onDelete: "CASCADE",
   }
 )
-@JoinColumn({ name: "path_list_id" })
-pathList!: Path_List;
+@JoinColumn({ name: "path_id" })
+path!: Path;
 
-  @Column({ type: "int" })
-  path_list_id!: number;
-
+@Column({ type: "int" })
+path_id!: number;
   // ارتباط با دوره
   @ManyToOne(
     () => Course,

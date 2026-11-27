@@ -1,10 +1,10 @@
 import { AppDataSource } from "../../databases/data-source";
 import { AppError } from "../../shared/errors/app.error";
 import { coursesRepository } from "../courses/courses.repository";
+import { pathRepository } from "../path/path.repository";
 import { addCourseToPathDto, changeCoursePathDto } from "./courses_path.dto";
 import {
-  pathList_courseRepository,
-  pathListRepository,
+  pathList_courseRepository
 } from "./courses_path.repository";
 import { PathList_course } from "./entity/pathList_course.entity";
 
@@ -37,10 +37,10 @@ export const getAllCoursPath_service = async (id: number) => {
 export const addCourseToPath_service = async (data: addCourseToPathDto) => {
   console.log({
     courseId: data.courseId,
-    pathId: data.pathListId,
+    pathId: data.pathId,
   });
-  const isExistPath = await pathListRepository.existsBy({
-    id: +data.pathListId,
+  const isExistPath = await pathRepository.existsBy({
+    id: +data.pathId,
   });
   if (!isExistPath) {
     throw new AppError("path not found", 404);
@@ -53,7 +53,7 @@ export const addCourseToPath_service = async (data: addCourseToPathDto) => {
   }
   const isExistCourseToPathDuplicate = await pathList_courseRepository.existsBy(
     {
-      path_list_id: +data.pathListId,
+      path_list_id: +data.pathId,
       number_course_tutorial: +data.number_course_tutorial,
     },
   );
@@ -62,7 +62,7 @@ export const addCourseToPath_service = async (data: addCourseToPathDto) => {
   }
   const addCourseToPath = await pathList_courseRepository.create({
     coursesId: +data.courseId,
-    path_list_id: +data.pathListId,
+    path_list_id: +data.pathId,
     number_course_tutorial: +data.number_course_tutorial,
   });
   await pathList_courseRepository.save(addCourseToPath);

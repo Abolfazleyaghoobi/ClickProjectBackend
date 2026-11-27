@@ -1,60 +1,60 @@
 
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  DeleteDateColumn,
-  ManyToOne,
-  OneToMany,
-  JoinColumn,
-  OneToOne,
-} from "typeorm";
+// import {
+//   Entity,
+//   PrimaryGeneratedColumn,
+//   Column,
+//   CreateDateColumn,
+//   UpdateDateColumn,
+//   DeleteDateColumn,
+//   ManyToOne,
+//   OneToMany,
+//   JoinColumn,
+//   OneToOne,
+// } from "typeorm";
 
-import { Path } from "../../path/entity/path.entity";
-import { PathList_course } from "./pathList_course.entity";
+// import { Path } from "../../path/entity/path.entity";
+// import { PathList_course } from "./pathList_course.entity";
 
-@Entity("Path_List")
-export class Path_List {
-  @PrimaryGeneratedColumn()
-  id!: number;
+// @Entity("Path_List")
+// export class Path_List {
+//   @PrimaryGeneratedColumn()
+//   id!: number;
 
-  // هر بخش متعلق به یک مسیر است
- @OneToOne(
-  () => Path,
-  (path) => path.Path_List,
-  { onDelete: "CASCADE" }
-)
-@JoinColumn({ name: "pathId" })
-path!: Path;
+//   // هر بخش متعلق به یک مسیر است
+//  @OneToOne(
+//   () => Path,
+//   (path) => path.Path_List,
+//   { onDelete: "CASCADE" }
+// )
+// @JoinColumn({ name: "pathId" })
+// path!: Path;
 
-@Column({ type: "int", unique: true })
-pathId!: number;
+// @Column({ type: "int", unique: true })
+// pathId!: number;
 
-  // هر بخش می‌تواند چندین ارتباط با دوره‌ها داشته باشد
-  @OneToMany(
-    () => PathList_course,
-    (pathListCourse) => pathListCourse.pathList,
-  )
-  courses!: PathList_course[];
+//   // هر بخش می‌تواند چندین ارتباط با دوره‌ها داشته باشد
+//   @OneToMany(
+//     () => PathList_course,
+//     (pathListCourse) => pathListCourse.pathList,
+//   )
+//   courses!: PathList_course[];
 
-  @CreateDateColumn({
-    type: "datetime",
-    name: "created_at",
-  })
-  created_at!: Date;
+//   @CreateDateColumn({
+//     type: "datetime",
+//     name: "created_at",
+//   })
+//   created_at!: Date;
 
-  @UpdateDateColumn({
-    type: "datetime",
-    name: "updated_at",
-  })
-  updated_at!: Date;
+//   @UpdateDateColumn({
+//     type: "datetime",
+//     name: "updated_at",
+//   })
+//   updated_at!: Date;
 
-  @DeleteDateColumn({
-    type: "datetime",
-    name: "deleted_at",
-    nullable: true,
-  })
-  deleted_at!: Date | null;
-}
+//   @DeleteDateColumn({
+//     type: "datetime",
+//     name: "deleted_at",
+//     nullable: true,
+//   })
+//   deleted_at!: Date | null;
+// }

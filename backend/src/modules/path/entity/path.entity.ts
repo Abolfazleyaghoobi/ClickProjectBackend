@@ -9,7 +9,8 @@ import {
   OneToMany,
   OneToOne,
 } from "typeorm";
-import {  Path_List } from "../../courses_path/entity/path_list.entity";
+// import {  Path_List } from "../../courses_path/entity/path_list.entity";
+import { PathList_course } from "../../courses_path/entity/pathList_course.entity";
 export enum isPublished {
   yes = "yes",
   no = "no",
@@ -52,11 +53,11 @@ export class Path {
   
 
 
-@OneToOne(
-  () => Path_List,
-  (pathList) => pathList.path
+@OneToMany(
+  () => PathList_course,
+  (pathListCourse) => pathListCourse.path
 )
-Path_List!: Path_List;
+pathList_course!: PathList_course[];
   @CreateDateColumn({
     type: "datetime",
     name: "created_at",
